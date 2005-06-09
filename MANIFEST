@@ -1,0 +1,18 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Business/BR.pm
+lib/Business/BR/CPF.pm
+lib/Business/BR/CNPJ.pm
+lib/Business/BR/Ids.pm
+lib/Business/BR/Ids/Common.pm
+lib/Business/BR/Biz.pm
+t/dot.t
+t/cpf_test.t
+t/cpf_flatten.t
+t/cpf_format.t
+t/cpf_parse.t
+t/cnpj_test.t
+t/ids_test.t
+META.yml                                 Module meta-data (added by MakeMaker)
