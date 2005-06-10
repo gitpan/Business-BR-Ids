@@ -13,10 +13,10 @@ our @ISA = qw(Exporter);
 #our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 #our @EXPORT = qw();
 
-our @EXPORT_OK = qw( flatten_cpf format_cpf parse_cpf );
+our @EXPORT_OK = qw( flatten_cpf format_cpf parse_cpf random_cpf );
 our @EXPORT = qw( test_cpf );
 
-our $VERSION = '0.00_04';
+our $VERSION = '0.00_05';
 
 use Scalar::Util qw(looks_like_number); 
 
@@ -64,6 +64,33 @@ sub parse_cpf {
   return { base => $base, dv => $dv };
 }
 
+# my ($dv1, $dv2) = _dv_cpf('390.533.447-05') # => $dv1 = 0, $dv2 = 5
+# my ($dv1, $dv2) = _dv_cpf('390.533.447-05', 0) # computes non-valid check digits
+#
+# computes the check digits of the candidate CPF number given as argument
+# (only the first 9 digits enter the computation)
+sub _dv_cpf {
+	my $base = shift; # expected to be flattened already ?!
+	my $valid = @_ ? shift : 1;
+	my $dev = $valid ? 0 : 2; # deviation (to make CPF invalid)
+	my @base = split '', substr($base, 0, 9);
+	my $dv1 = -_dot([10, 9, 8, 7, 6, 5, 4, 3, 2], \@base) % 11 % 10;
+	my $dv2 = (-_dot([0, 10, 9, 8, 7, 6, 5, 4, 3, 2], [ @base, $dv1 ]) + $dev) % 11 % 10;
+	return ($dv1, $dv2) if wantarray;
+	return "$dv1$dv2";
+}
+
+# generates a random (correct or incorrect) CPF
+# $cpf = rand_cpf();
+# $cpf = rand_cpf($valid);
+#
+# if $valid==0, produces an invalid CPF. 
+sub random_cpf {
+	my $valid = @_ ? shift : 1; # valid CPF by default
+	my $base = sprintf "%09s", int(rand(1E9)); # 9 dígitos
+	my ($dv1, $dv2) = _dv_cpf($base, $valid);
+	return "$base$dv1$dv2";
+}
 
 1;
 
@@ -179,12 +206,29 @@ returns a two-element list with the base and the check
 digits. In a scalar context, returns a hash ref
 with keys 'base' and 'dv' and associated values.
 
+=item B<random_cpf>
+
+  $rand_cpf = random_cpf($valid);
+
+  $correct_cpf = random_cpf();
+  $cpf = random_cpf(1); # also a correct CPF
+  $bad_cpf = random_cpf(0); # an incorrect CPF
+
+Generates a random CPF. If $valid is omitted or 1, it is guaranteed
+to be I<correct>. If $valid is 0, it is guaranteed to be I<incorrect>.
+This function is intented for mass test. (Use it wisely.)
+
+The implementation is simple: just generate a 9-digits random number,
+hopefully with a uniform distribution and then compute the check digits.
+If $valid==0, the check digits are computed B<not to> satisfy the
+check equations.
+
 =back
 
 =head2 EXPORT
 
 C<test_cpf> is exported by default. C<flatten_cpf>, C<format_cpf>,
-and C<parse_cpf> can be exported on demand.
+C<parse_cpf> and C<random_cpf> can be exported on demand.
 
 
 =head1 THE CHECK EQUATIONS

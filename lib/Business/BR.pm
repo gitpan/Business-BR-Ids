@@ -11,7 +11,7 @@ use warnings;
 #our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 #our @EXPORT = qw();
 
-our $VERSION = '0.00_04';
+our $VERSION = '0.00_05';
 
 1;
 
@@ -31,9 +31,7 @@ This module is meant to provide a root for the namespace Business::BR.
 It is meant as a placeholder to reserve and explain how the
 namespace can be used.
 
-To see actual code, take a look at 
-L<Business::BR::*|http://search.cpan.org/search?query=Business%3A%3ABR&mode=module> 
-modules
+To see actual code, take a look at C<Business::BR::*> modules
 
   http://search.cpan.org/search?query=Business%3A%3ABR&mode=module
 
@@ -42,9 +40,9 @@ modules
 The namespace has been chosen based on similar modules
 for other countries, like Business::FR::SSN which tests
 the French "Numéro de Sécurité Sociale", the 
-L<Business::AU::*|http://search.cpan.org/search?query=Business%3A%3AAU&mode=module> 
+C<Business::AU::*> L<http://search.cpan.org/search?query=Business%3A%3AAU&mode=module> 
 and 
-L<Business::CN::*|http://search.cpan.org/search?query=Business%3A%3ACN&mode=module>
+C<Business::CN::*> L<http://search.cpan.org/search?query=Business%3A%3ACN&mode=module>
 modules.
 
 Please reports bugs via CPAN RT, 

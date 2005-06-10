@@ -5,14 +5,17 @@ README
 lib/Business/BR.pm
 lib/Business/BR/CPF.pm
 lib/Business/BR/CNPJ.pm
+#lib/Business/BR/IE.pm
 lib/Business/BR/Ids.pm
 lib/Business/BR/Ids/Common.pm
 lib/Business/BR/Biz.pm
-t/dot.t
-t/cpf_test.t
-t/cpf_flatten.t
-t/cpf_format.t
-t/cpf_parse.t
-t/cnpj_test.t
-t/ids_test.t
+t/001_dot.t
+t/002_cpf_test.t
+t/003_cpf_flatten.t
+t/004_cpf_format.t
+t/005_cpf_parse.t
+t/006_cnpj_test.t
+t/007_ids_test.t
+t/008_cpf_rand.t
+t/009_cnpj_rand.t
 META.yml                                 Module meta-data (added by MakeMaker)

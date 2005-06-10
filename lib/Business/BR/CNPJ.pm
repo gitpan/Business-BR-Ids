@@ -13,10 +13,10 @@ our @ISA = qw(Exporter);
 #our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 #our @EXPORT = qw();
 
-our @EXPORT_OK = qw( flatten_cnpj format_cnpj parse_cnpj );
+our @EXPORT_OK = qw( flatten_cnpj format_cnpj parse_cnpj random_cnpj );
 our @EXPORT = qw( test_cnpj );
 
-our $VERSION = '0.00_04';
+our $VERSION = '0.00_05';
 
 use Scalar::Util qw(looks_like_number); 
 
@@ -61,6 +61,35 @@ sub parse_cnpj {
     return ($base, $filial, $dv);
   }
   return { base => $base, filial => $filial, dv => $dv };
+}
+
+# my ($dv1, $dv2) = _dv_cnpj('') # => $dv1 = ?, $dv2 = ?
+# my ($dv1, $dv2) = _dv_cnpj('', 0) # computes non-valid check digits
+#
+# computes the check digits of the candidate CNPJ number given as argument
+# (only the first 12 digits enter the computation)
+sub _dv_cnpj {
+	my $base = shift; # expected to be flattened already ?!
+	my $valid = @_ ? shift : 1;
+	my $dev = $valid ? 0 : 2; # deviation (to make CNPJ invalid)
+	my @base = split '', substr($base, 0, 12);
+	my $dv1 = -_dot([5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2], \@base) % 11 % 10;
+	my $dv2 = (-_dot([6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2], [ @base, $dv1 ]) + $dev) % 11 % 10;
+	return ($dv1, $dv2) if wantarray;
+	return "$dv1$dv2";
+}
+
+# generates a random (correct or incorrect) CNPJ
+# $cpf = rand_cnpj();
+# $cpf = rand_cnpj($valid);
+#
+# if $valid==0, produces an invalid CNPJ. 
+sub random_cnpj {
+	my $valid = @_ ? shift : 1; # valid CNPJ by default
+	my $base = sprintf "%08s", int(rand(1E8)); # 8 dígitos
+	my $var = sprintf "%04s", ((rand()<0.95) ? "0001" : int(sqrt rand(1E8)));
+	my ($dv1, $dv2) = _dv_cnpj("$base$var", $valid);
+	return "$base$var$dv1$dv2";
 }
 
 
@@ -111,14 +140,14 @@ it satisfies the two check equations mentioned below
 
 Before checking, any non-digit letter is stripped, making it
 easy to test formatted entries like '11.111.111/0001-55' and
-entries with extra blanks like '   11.111.111/0001-55  '.
+entries with extra blanks like '   43.337.004 / 0001-72  '.
 
 =over 4
 
 =item B<test_cnpj>
 
-  test_cnpj('999.444.333-55') # incorrect CPF, returns 0
-  test_cnpj(' 263.946.533-30 ') # is ok, returns 1
+  test_cnpj('48.999.764/0001-60') # incorrect CPF, returns 0
+  test_cnpj(' 43.337.004/0001-72 ') # is ok, returns 1
   test_cnpj('888') # nope, returns undef
 
 Tests whether a CNPJ number is correct. Before testing,
@@ -131,26 +160,26 @@ The policy to get rid of '.', '/' and '-' is very liberal.
 It indeeds discards anything that is not a digit (0, 1, ..., 9).
 That is handy for discarding spaces as well. 
 
-  test_cpf(' 263.946.533-30 ') # is ok, returns 1
+  test_cnpj(' 66.818.021/0001-27 ') # is ok, returns 1
 
-But extraneous inputs like '#333%444*2a3s2z~00' are
+But extraneous inputs like 'a53##045%4-20**0001!50' are
 also accepted. If you are worried about this kind of input,
 just check against a regex:
 
-  warn "bad CPF: only digits (14) expected" 
-    unless ($cpf =~ /^\d{14}$/);
+  warn "bad CNPJ: only digits (14) expected" 
+    unless ($cnpj =~ /^\d{14}$/);
 
-  warn "bad CPF: does not match mask '__.___.___/____-__'" 
-    unless ($cpf =~ /^\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}$/);
+  warn "bad CNPJ: does not match mask '__.___.___/____-__'" 
+    unless ($cnpj =~ /^\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}$/);
 
-NOTE. Integer numbers like 9999811299 (or 99_998_112_99) 
+NOTE. Integer numbers like 3337004000158 (or 3_337_004_0001_58) 
 with fewer than 14 digits will be normalized (eg. to
-99_999_999_9999_99) before testing.
+03_337_004_0001_58) before testing.
 
 =item B<flatten_cnpj>
 
-  flatten_cnpj(99); # returns '00000000099'
-  flatten_cnpj('999.999.999-99'); # returns '99999999999'
+  flatten_cnpj(1); # returns '00000000000001'
+  flatten_cnpj('99.999.222/0001-12'); # returns '99999222000112'
 
 Flattens a candidate for a CNPJ number. In case,
 the argument is an integer, it is formatted to at least
@@ -178,6 +207,26 @@ parts. In a list context,
 returns a three-element list with the base, the radical and the check
 digits. In a scalar context, returns a hash ref
 with keys 'base', 'filial' and 'dv' and associated values.
+
+=item B<random_cnpj>
+
+  $rand_cnpj = random_cnpj($valid);
+
+  $good_cnpj = random_cnpj();
+  $cnpj = random_cnpj(1); # also a good one
+  $bad_cnpj = random_cnpj(0); # bad CNPJ
+
+Generates a random CNPJ. If $valid is omitted or 1, it is guaranteed
+to be I<correct>. If $valid is 0, it is guaranteed to be I<incorrect>.
+This function is intented for mass test. (Use it wisely.)
+
+The implementation is: generate a 8-digits random number for the base,
+and the variation is chosen 95% of the time to be '0001'
+and the other 5% a skewed random distribution with the expression
+C<int(sqr rand(1E8))> is used. A uniform distribution is expected from
+C<rand>. With the base and variation compute the check digits.
+If $valid==0, the check digits are computed B<not to> satisfy the
+check equations.
 
 =back
 

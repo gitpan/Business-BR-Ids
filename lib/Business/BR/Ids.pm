@@ -9,9 +9,10 @@ require Exporter;
 our @ISA = qw(Exporter);
 #our %EXPORT_TAGS = ( 'all' => [ qw() ] );
 #our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
+our @EXPORT_OK = qw( flatten parse random );
 our @EXPORT = qw( test );
 
-our $VERSION = '0.00_04';
+our $VERSION = '0.00_05';
 
 use Carp;
 
@@ -19,15 +20,40 @@ use Carp;
 my %types = (
   cpf => 'Business::BR::CPF',
   cnpj => 'Business::BR::CNPJ',
+  #ie => 'Business::BR::IE',
 );
 
-sub test {
+
+# invoke($type, $subroot, @args)
+sub _invoke {
 	my $type = lc shift;
-	my $package = $types{$type} 
+	my $subroot = shift;
+	my $package = $types{$type}
 		or croak "unknown '$type'\n";
 	eval "require $package";
 	no strict 'refs';
-	return &{"${package}::test_${type}"}(@_);
+	return &{"${package}::${subroot}${type}"}(@_);
+}
+
+sub test {
+	return _invoke(shift, 'test_', @_);
+}
+
+sub flatten {
+	return _invoke(shift, 'flatten_', @_);
+}
+
+# PROBLEM: format is builtin - needs a work around
+#sub format {
+#	return _invoke(shift, 'format_', @_);
+#}
+
+sub parse {
+	return _invoke(shift, 'parse_', @_);
+}
+
+sub random {
+	return _invoke(shift, 'random_', @_);
 }
 
 1;
@@ -41,10 +67,10 @@ Business::BR::Ids - Modules for dealing with Brazilian identification codes (CPF
 =head1 SYNOPSIS
 
   use Business::BR::Ids;
-  my $cpf = '';
-  print "$cpf as CPF is ", (test('cpf', '') ? "ok" : "not ok"), "\n";
-  my $cnpj = '';
-  print "$cnpj as CNPJ is ", (test('cnpj', '') ? "ok" : "not ok"), "\n";
+  my $cpf = '390.533.447-05';
+  print "ok as CPF" if test('cpf', $cpf);
+  my $cnpj = '90.117.749/7654-80';
+  print "ok as CNPJ" if test('cnpj', $cnpj);
 
 =head1 DESCRIPTION
 
@@ -76,10 +102,35 @@ C<test> is exported by default.
  flatten_*
  format_*
  parse_*
- rand_*
+ random_*
  
  =head1 ETHICS
 
+ The facilities provided here can be used for bad purposes,
+ like generating correct codes for trying frauds.
+ This is specially true of the C<random_*()> functions.
+ But anyway with only C<test_*()> functions, it is also very
+ easy to try typically 100 choices and find a correct
+ code as well. 
+
+ Unethical programmers (as any unethical people) should not be 
+ a reason to conceal things (like code) that can benefit
+ a community. And I felt that this kind of code sometimes
+ is hidden by other wrong reasons: to keep such a knowledge
+ restricted to a group of people wanting to make money of it.
+ But this is (or should be) public information.
+
+ If institutions were really worried about this, they
+ should publish validation equations like the ones
+ listed in the documentation here instead of computation
+ algorithms for check digits. If one does not know enough
+ math to solve the equations, probably
+ they don't need the solutions anyway. 
+
+ For modules on this distribution, only correctness is tested.
+ For doing business, usually codes must be verified 
+ against the databases of the information owners, usually
+ government bodies. 
 
 
 =end comment

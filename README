@@ -1,12 +1,30 @@
-Business-BR-Ids version 0.00_04
+Business-BR-Ids version 0.00_05
 ===============================
 
-The intention of this distribution is to provide functionality
+The intention of this distribution is to provide facilities
+to deal with Brazilian identification numbers and codes.
+It is part of a set of distributions to approach programming
 on Brazilian business-related subjects.
-The emphasis is on dealing with Brazilian identification
-numbers and codes, like CPF, CNPJ and others.
-The distribution is starting up with a simple checks
-to test if CPF and CNPJ numbers are correct or not. More is to come.
+The distribution is starting up with support to CPF and CNPJ
+(tests for correctness, canonicalization, formatting, parsing,
+random generation for mass tests). More is to come.
+
+The actually supported codes follow along with a brief explanation
+of what they are good for and who emits them.
+
+  * CPF  - to identify citizens as taxpayers in nation-wide context, 
+           emitted by the Brazilian Ministry of Revenue
+  * CNPJ - to identify companies as taxpayers in nation-wide context, 
+           emitted by the Brazilian Ministry of Revenue
+
+Some of the next ones to be supported are:
+
+  * IE   - to identify companies as taxpayers in state-wide contexts,
+           emitted by the Secretariat of Revenue of each state
+  * TE   - to identify citizens as allowed voters, emitted by
+           Regional Electoral Courts under the control 
+	   of the Superior Electoral Court
+  * PIS  - to identify citizens as users of the public health services
 
 INSTALLATION
 
@@ -24,12 +42,19 @@ DEPENDENCIES
 
 TO DO
 
-* include test for _dot() with @a < @b 
-* revise POD for new module Business::BR::CNPJ
-* write tests for new module Business::BR::CNPJ
+* write tests for module Business::BR::CNPJ
 * enhance Business::BR::Ids
-* introduce rand_cpf() and rand_cnpj() in the appropriate modules
-* revise this README file
+* revisit test for _dot() with @a < @b (for $] < 5.8)
+* introduce Business::BR::IE
+* introduce Business::BR::TE
+* write article 'br-docs.pod'
+* get rid of Business::BR::Biz
+* random_cnpj() calls for a better pseudo-random
+  distribution when selecting variation in Business::BR::CNPJ
+* introduce the $flatten argument to test_*(),
+  format_*(), parse_*() methods
+* write tests for module Business::BR::Ids
+* what about Business::BR::PIS and Business::BR::Passport?
 
 COPYRIGHT AND LICENCE
 

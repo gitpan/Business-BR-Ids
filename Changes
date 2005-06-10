@@ -1,5 +1,22 @@
 Revision history for Perl extension Business-BR-Ids.
 
+0.00_05 Tue Jun 9 2005
+        - Deprecates Business::BR::Biz (waiting for the move
+	  of its content somewhere else)
+        - README file revised
+        - first revision to POD in Business::BR::CNPJ
+	- new test "t/009_cnpj_rand.t"
+        - random_cnpj() in Business::BR::CNPJ
+        - test scripts renamed (eg. "t/dot.t" to "t/001_dot.t")
+        - random() in Business::BR::Ids
+	- new test "t/008_cpf_rand.t"
+        - random_cpf() in Business::BR::CPF
+        - introduced flatten() and parse() to Business::BR::Ids
+	  with a small refactoring avoiding redundant code
+        - fixed synopsis of Business::BR::Ids
+        - test for _dot() with @a < @b now works for $] < 5.8
+        - fixed broken links at Business::BR, I hope
+
 0.00_04 Tue Jun 9 2005
         - I thought about letting MakeMaker generate META.yml automatically 
 	  again - but it does not generate the 'author' and 'licence' keys

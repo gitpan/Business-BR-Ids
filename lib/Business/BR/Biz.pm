@@ -11,7 +11,7 @@ use warnings;
 #our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 #our @EXPORT = qw();
 
-our $VERSION = '0.00_03';
+our $VERSION = '0.00_05';
 
 1;
 
@@ -19,7 +19,7 @@ __END__
 
 =head1 NAME
 
-Business::BR::Biz - Modules for Brazilian business-related subjects
+Business::BR::Biz - Deprected (was: Modules for Brazilian business-related subjects)
 
 =head1 SYNOPSIS
 
