@@ -16,7 +16,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( flatten_cpf format_cpf parse_cpf random_cpf );
 our @EXPORT = qw( test_cpf );
 
-our $VERSION = '0.00_05';
+our $VERSION = '0.00_06';
 
 use Scalar::Util qw(looks_like_number); 
 

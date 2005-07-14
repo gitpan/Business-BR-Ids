@@ -9,10 +9,10 @@ require Exporter;
 our @ISA = qw(Exporter);
 #our %EXPORT_TAGS = ( 'all' => [ qw() ] );
 #our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-our @EXPORT_OK = qw( flatten parse random );
+our @EXPORT_OK = qw( flatten parse format random );
 our @EXPORT = qw( test );
 
-our $VERSION = '0.00_05';
+our $VERSION = '0.00_06';
 
 use Carp;
 
@@ -50,6 +50,10 @@ sub flatten {
 
 sub parse {
 	return _invoke(shift, 'parse_', @_);
+}
+
+sub format {
+	return _invoke(shift, 'format_', @_);
 }
 
 sub random {

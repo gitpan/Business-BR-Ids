@@ -15,7 +15,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw( _dot );
 
-our $VERSION = '0.00_04';
+our $VERSION = '0.00_06';
 
 sub _dot {
   my $a = shift;
@@ -27,6 +27,18 @@ sub _dot {
   return $s;
 }
 
+#sub _is_number {
+#	my $n = shift;
+#	return 0 unless defined $n; # undef is not number
+#	return 0 unless $n eq ''; # '' is not number
+#	if ($n == 0) {
+#
+#	}
+#	return !($n == 0 && $n ne "0")
+#} 
+# adapted from L<perldata/"Scalar Values">
+
+#sub _is_integer {}
 
 1;
 

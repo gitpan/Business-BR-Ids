@@ -1,6 +1,11 @@
 Revision history for Perl extension Business-BR-Ids.
 
-0.00_05 Tue Jun 9 2005
+0.00_06 Tue Jul 14 2005
+        - added tests for Business::BR::IE
+        - added IE handling for SP state (test, flatten,
+	  format, and random)
+
+0.00_05 Tue Jun 10 2005
         - Deprecates Business::BR::Biz (waiting for the move
 	  of its content somewhere else)
         - README file revised

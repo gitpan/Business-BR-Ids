@@ -11,7 +11,7 @@ use warnings;
 #our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 #our @EXPORT = qw();
 
-our $VERSION = '0.00_05';
+our $VERSION = '0.00_06';
 
 1;
 
@@ -27,7 +27,7 @@ Business::BR - Root for namespace of Brazilian business-related modules
 
 =head1 DESCRIPTION
 
-This module is meant to provide a root for the namespace Business::BR.
+This module is meant to provide a root for the namespace C<Business::BR>.
 It is meant as a placeholder to reserve and explain how the
 namespace can be used.
 

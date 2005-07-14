@@ -16,7 +16,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( flatten_cnpj format_cnpj parse_cnpj random_cnpj );
 our @EXPORT = qw( test_cnpj );
 
-our $VERSION = '0.00_05';
+our $VERSION = '0.00_06';
 
 use Scalar::Util qw(looks_like_number); 
 
@@ -224,7 +224,7 @@ The implementation is: generate a 8-digits random number for the base,
 and the variation is chosen 95% of the time to be '0001'
 and the other 5% a skewed random distribution with the expression
 C<int(sqr rand(1E8))> is used. A uniform distribution is expected from
-C<rand>. With the base and variation compute the check digits.
+C<rand>. With the base and variation, the check digits are computed.
 If $valid==0, the check digits are computed B<not to> satisfy the
 check equations.
 
@@ -233,7 +233,7 @@ check equations.
 =head2 EXPORT
 
 C<test_cnpj> is exported by default. C<flatten_cnpj>, C<format_cnpj>,
-and C<parse_cnpj> can be exported on demand.
+C<parse_cnpj> and C<random_cnpj> can be exported on demand.
 
 
 =head1 THE CHECK EQUATIONS
