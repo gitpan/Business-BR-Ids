@@ -12,7 +12,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( flatten parse format random );
 our @EXPORT = qw( test );
 
-our $VERSION = '0.00_06';
+our $VERSION = '0.00_07';
 
 use Carp;
 
@@ -20,7 +20,7 @@ use Carp;
 my %types = (
   cpf => 'Business::BR::CPF',
   cnpj => 'Business::BR::CNPJ',
-  #ie => 'Business::BR::IE',
+  ie => 'Business::BR::IE',
 );
 
 

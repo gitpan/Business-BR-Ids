@@ -8,7 +8,7 @@ lib/Business/BR/CNPJ.pm
 lib/Business/BR/IE.pm
 lib/Business/BR/Ids.pm
 lib/Business/BR/Ids/Common.pm
-lib/Business/BR/Biz.pm
+lib/Business/BR/Biz.pm                   DEPRECATED
 t/001_dot.t
 t/002_cpf_test.t
 t/003_cpf_flatten.t

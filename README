@@ -1,4 +1,4 @@
-Business-BR-Ids version 0.00_06
+Business-BR-Ids version 0.00_07
 ===============================
 
 The intention of this distribution is to provide facilities
@@ -16,9 +16,12 @@ of what they are good for and who emits them.
            emitted by the Brazilian Ministry of Revenue
   * CNPJ - to identify companies as taxpayers in nation-wide context, 
            emitted by the Brazilian Ministry of Revenue
-  * IE-SP - to identify companies as taxpayers in state-wide context,
+  * IE-SP
+    IE-PR
+         - to identify companies as taxpayers in state-wide context,
            emitted by Revenue Secretariats of Brazilian States
-	   (by now supporting only the state of Sao Paulo)
+	   (by now supporting only the states of São Paulo
+	   and Paraná)
 
 Some of the next ones to be supported are:
 

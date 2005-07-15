@@ -13,7 +13,7 @@ our @ISA = qw(Exporter);
 #our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 #our @EXPORT = qw();
 
-our @EXPORT_OK = qw( _dot );
+our @EXPORT_OK = qw( _dot _flatten );
 
 our $VERSION = '0.00_06';
 
@@ -27,18 +27,20 @@ sub _dot {
   return $s;
 }
 
-#sub _is_number {
-#	my $n = shift;
-#	return 0 unless defined $n; # undef is not number
-#	return 0 unless $n eq ''; # '' is not number
-#	if ($n == 0) {
-#
-#	}
-#	return !($n == 0 && $n ne "0")
-#} 
-# adapted from L<perldata/"Scalar Values">
+use Scalar::Util qw(looks_like_number); 
 
-#sub _is_integer {}
+# usage: _flatten($piece, size => 12)
+sub _flatten {
+  my $piece = shift;
+  my %options = @_;
+  if (looks_like_number($piece) && int($piece)==$piece) {
+	  return sprintf('%0*s', $options{size}, $piece)
+  } else {
+	  $piece =~ s/\D//g;
+	  return $piece;
+  }
+}   
+
 
 1;
 

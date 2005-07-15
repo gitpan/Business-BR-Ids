@@ -16,19 +16,20 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( flatten_cpf format_cpf parse_cpf random_cpf );
 our @EXPORT = qw( test_cpf );
 
-our $VERSION = '0.00_06';
+our $VERSION = '0.00_07';
 
-use Scalar::Util qw(looks_like_number); 
+#use Scalar::Util qw(looks_like_number); 
 
-use Business::BR::Ids::Common qw(_dot);
+use Business::BR::Ids::Common qw(_dot _flatten);
 
 sub flatten_cpf {
-  my $cpf = shift;
-  if (looks_like_number($cpf) && int($cpf)==$cpf) {
-	  return sprintf('%011s', $cpf)
-  }
-  $cpf =~ s/\D//g;
-  return $cpf;
+  #my $cpf = shift;
+  #if (looks_like_number($cpf) && int($cpf)==$cpf) {
+  #  return sprintf('%011s', $cpf)
+  #}
+  #$cpf =~ s/\D//g;
+  #return $cpf;
+  return _flatten(shift, size => 11);
 }   
 
 
@@ -69,6 +70,9 @@ sub parse_cpf {
 #
 # computes the check digits of the candidate CPF number given as argument
 # (only the first 9 digits enter the computation)
+#
+# In list context, it returns the check digits.
+# In scalar context, it returns the complete CPF (base and check digits)
 sub _dv_cpf {
 	my $base = shift; # expected to be flattened already ?!
 	my $valid = @_ ? shift : 1;
@@ -77,7 +81,9 @@ sub _dv_cpf {
 	my $dv1 = -_dot([10, 9, 8, 7, 6, 5, 4, 3, 2], \@base) % 11 % 10;
 	my $dv2 = (-_dot([0, 10, 9, 8, 7, 6, 5, 4, 3, 2], [ @base, $dv1 ]) + $dev) % 11 % 10;
 	return ($dv1, $dv2) if wantarray;
-	return "$dv1$dv2";
+	#return "$dv1$dv2";
+	substr($base, 9, 2) = "$dv1$dv2";
+	return $base;
 }
 
 # generates a random (correct or incorrect) CPF
@@ -88,8 +94,9 @@ sub _dv_cpf {
 sub random_cpf {
 	my $valid = @_ ? shift : 1; # valid CPF by default
 	my $base = sprintf "%09s", int(rand(1E9)); # 9 dígitos
-	my ($dv1, $dv2) = _dv_cpf($base, $valid);
-	return "$base$dv1$dv2";
+	#my ($dv1, $dv2) = _dv_cpf($base, $valid);
+	#return "$base$dv1$dv2";
+	return _dv_cpf($base, $valid);
 }
 
 1;

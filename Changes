@@ -1,5 +1,19 @@
 Revision history for Perl extension Business-BR-Ids.
 
+0.00_07 Tue Jul 15 2005 ?
+        - the IE functions were made case-insensitive ('MG' works
+	  the same as 'mg')
+        - added IE handling for PR state (test, flatten, format,
+	  random, and parse)
+        - introduced _flatten in Business::BR::Ids::Common,
+	  avoiding the redundant code of the various flatten_*()
+	  methods
+        - changed semantics of calling _dv_*() in scalar context -
+	  instead of returning a concatenation of the check digits,
+	  it returns a complete entity with check digits in
+	  (in IE-SP the check digits are the ninth and 12nd -
+	  so that the concatenation of check digits is good for nothing)
+
 0.00_06 Tue Jul 14 2005
         - added tests for Business::BR::IE
         - added IE handling for SP state (test, flatten,
