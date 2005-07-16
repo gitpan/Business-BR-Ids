@@ -15,7 +15,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw( _dot _flatten );
 
-our $VERSION = '0.00_06';
+our $VERSION = '0.00_08';
 
 sub _dot {
   my $a = shift;

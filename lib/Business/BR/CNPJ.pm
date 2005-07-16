@@ -16,19 +16,11 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( flatten_cnpj format_cnpj parse_cnpj random_cnpj );
 our @EXPORT = qw( test_cnpj );
 
-our $VERSION = '0.00_07';
-
-#use Scalar::Util qw(looks_like_number); 
+our $VERSION = '0.00_08';
 
 use Business::BR::Ids::Common qw(_dot _flatten);
 
 sub flatten_cnpj {
-  #my $cnpj = shift;
-  #if (looks_like_number($cnpj) && int($cnpj)==$cnpj) {
-  #	  return sprintf('%014s', $cnpj)
-  #}
-  #$cnpj =~ s/\D//g;
-  #return $cnpj;
   return _flatten(shift, size => 14);
 }   
 
@@ -80,7 +72,6 @@ sub _dv_cnpj {
 	my $dv1 = -_dot([5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2], \@base) % 11 % 10;
 	my $dv2 = (-_dot([6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2], [ @base, $dv1 ]) + $dev) % 11 % 10;
 	return ($dv1, $dv2) if wantarray;
-	#return "$dv1$dv2";
 	substr($base, 12, 2) = "$dv1$dv2";
 	return $base;
 
@@ -95,9 +86,7 @@ sub random_cnpj {
 	my $valid = @_ ? shift : 1; # valid CNPJ by default
 	my $base = sprintf "%08s", int(rand(1E8)); # 8 dígitos
 	my $var = sprintf "%04s", ((rand()<0.95) ? "0001" : int(sqrt rand(1E8)));
-	#my ($dv1, $dv2) = _dv_cnpj("$base$var", $valid);
-	#return "$base$var$dv1$dv2";
-	return _dv_cnpj("$base$var", $valid);
+	return scalar _dv_cnpj("$base$var", $valid);
 }
 
 

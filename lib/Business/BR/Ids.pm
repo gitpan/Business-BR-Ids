@@ -7,12 +7,10 @@ use warnings;
 
 require Exporter;
 our @ISA = qw(Exporter);
-#our %EXPORT_TAGS = ( 'all' => [ qw() ] );
-#our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT_OK = qw( flatten parse format random );
 our @EXPORT = qw( test );
 
-our $VERSION = '0.00_07';
+our $VERSION = '0.00_08';
 
 use Carp;
 
@@ -52,10 +50,6 @@ sub parse {
 	return _invoke(shift, 'parse_', @_);
 }
 
-sub format {
-	return _invoke(shift, 'format_', @_);
-}
-
 sub random {
 	return _invoke(shift, 'random_', @_);
 }
@@ -93,6 +87,8 @@ and CNPJ numbers without the need for explicitly 'requiring' or
 
 Tests for correct inputs of ids which have a corresponding Business::BR module.
 For now, the supported id types are 'cpf' and 'cnpj'.
+
+
 
 =head2 EXPORT
 

@@ -12,7 +12,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( flatten_ie format_ie parse_ie random_ie );
 our @EXPORT = qw( test_ie );
 
-our $VERSION = '0.00_07';
+our $VERSION = '0.00_08';
 
 use Business::BR::Ids::Common qw(_dot _flatten);
 
@@ -68,7 +68,7 @@ sub _dv_ie_pr {
 sub random_ie_pr {
 	my $valid = @_ ? shift : 1; # valid IE-SP by default
 	my $base = sprintf "%08s", int(rand(1E8)); # 8 dígitos
-	return _dv_ie_pr($base, $valid);
+	return scalar _dv_ie_pr($base, $valid);
 }
 sub parse_ie_pr {
   my $ie = flatten_ie_pr shift;
@@ -133,7 +133,6 @@ sub _dv_ie_sp {
 	my $dv1 = _dot([1, 3, 4, 5, 6, 7, 8, 10, 0, 0, 0, 0], \@base) % 11 % 10;
 	my $dv2 = (_dot([3, 2, 10, 9, 8, 7, 6, 5, 0, 3, 2, 0], \@base) + 4*$dv1 + $dev) % 11 % 10;
 	return ($dv1, $dv2) if wantarray;
-	#return "$dv1$dv2";
 	substr($base, 8, 1) = $dv1;
 	substr($base, 11, 1) = $dv2;
 	return $base
@@ -147,12 +146,7 @@ sub _dv_ie_sp {
 sub random_ie_sp {
 	my $valid = @_ ? shift : 1; # correct IE-SP by default
 	my $ie = sprintf "%08s0%02s0", int(rand(1E8)), int(rand(1E2)); # 10 dígitos aleatórios
-	#print "# IE-SP: $ie\n";
-	#my ($dv1, $dv2) = _dv_ie_sp($ie, $valid);
-	#substr($ie, 8, 1) = $dv1;
-	#substr($ie, 11, 1) = $dv2;
-	#return $ie;
-	return _dv_ie_sp($ie, $valid);
+	return scalar _dv_ie_sp($ie, $valid);
 }
 
 sub parse_ie_sp {

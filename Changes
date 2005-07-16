@@ -1,6 +1,17 @@
 Revision history for Perl extension Business-BR-Ids.
 
-0.00_07 Tue Jul 15 2005 ?
+0.00_08 Tue Jul 15 2005
+        - 0.00_07 was not indexed by CPAN: maybe it was 
+	  because of files that changed but didn't have
+	  their versions incremented
+        - the bug below was fixed by explicit "scalar" conversions
+        - a bug slipped when semantics of _dv_*() changed,
+	  allowing to reduce the code of random_*(). But then, instead
+	  of knowing only about scalar context,  random_*()
+	  returned the check digits on list context (like in
+	  "print random_cnpj()"
+
+0.00_07 Tue Jul 15 2005
         - the IE functions were made case-insensitive ('MG' works
 	  the same as 'mg')
         - added IE handling for PR state (test, flatten, format,
