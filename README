@@ -1,4 +1,4 @@
-Business-BR-Ids version 0.00_09
+Business-BR-Ids version 0.00_10
 ===============================
 
 The intention of this distribution is to provide facilities
@@ -17,12 +17,13 @@ of what they are good for and who emits them.
   * CNPJ - to identify companies as taxpayers in nation-wide context, 
            emitted by the Brazilian Ministry of Revenue
   * IE-AC
+    IE-AL
     IE-PR
     IE-SP
          - to identify companies as taxpayers in state-wide context,
            emitted by Revenue Secretariats of Brazilian States
-	   (by now supporting only the states of Acre, São Paulo
-	   and Paraná)
+	   (by now supporting only the states of Acre, Alagoas,
+	   São Paulo and Paraná)
 
 Some of the next ones to be supported are:
 
@@ -50,22 +51,18 @@ DEPENDENCIES
 TO DO
 
 * write tests for module Business::BR::CNPJ
-* revisit test for _dot() with @a < @b (for $] < 5.8)
 * introduce Business::BR::TE
 * write article 'br-docs.pod'
 * get rid of Business::BR::Biz
 * random_cnpj() calls for a better pseudo-random
   distribution when selecting variation in Business::BR::CNPJ
-* introduce the $flatten argument to test_*(),
+* introduce the $canon argument to test_*(),
   format_*(), parse_*() methods
 * write tests for module Business::BR::Ids
 * what about Business::BR::PIS and Business::BR::Passport?
 * complete Business::BR::IE
 * enhance Business::BR::Ids docs
 * parse_ie_sp() is missing
-
-* thinking about renaming 'flatten' to 'strip'
-  and 'format' to what?
 
 * 0.01 milestone: complete code for IE of each Brazilian state
 

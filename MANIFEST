@@ -11,16 +11,18 @@ lib/Business/BR/Ids/Common.pm
 lib/Business/BR/Biz.pm                   DEPRECATED
 t/001_dot.t
 t/002_cpf_test.t
-t/003_cpf_flatten.t
+t/003_cpf_canon.t
 t/004_cpf_format.t
 t/005_cpf_parse.t
 t/006_cnpj_test.t
 t/007_ids_test.t
 t/008_cpf_rand.t
 t/009_cnpj_rand.t
-t/010_ie_flatten.t
+t/010_ie_canon.t
 t/011_ie_test.t
 t/012_ie_format.t
 t/013_ie_rand.t
 t/014_ie_parse.t
+t/lib/IO/Capture.pm                      Used in t/001_dot.t to capture STDERR
+
 META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,5 +1,8 @@
 
-use Test::More tests => 5;
+use lib qw(t/lib);
+use IO::Capture qw(open_s close_s);
+
+use Test::More tests => 7;
 BEGIN { use_ok('Business::BR::Ids::Common', '_dot') };
 
 my @a = (1,1,1,1);
@@ -7,21 +10,33 @@ my @b = (1,1,1,1);
 
 is(_dot(\@a, \@b), 4, "_dot works");
 
-my @c = (1,1,1,1,1);
-is(_dot(\@a, \@c), 4, "_dot works for \@a < \@b");
+my @c = (1,undef,1,1);
+is(_dot(\@a, \@c), 3, "untrue's are discarded");
 
-# the following test is expected to emit a warning
-# to test this, the STDERR is captured and checked to be non-empty
+# the following tests are expected to emit warnings.
+# To test this, the STDERR is captured and checked to be non-empty
 
-SKIP: {
-  skip "for \$PERL_VERSION < 5.8", 2 if $] < 5.008;
+my @d = (1,1,1,1,1);
+{
+  local *STDERR;
+  open_s *STDERR;
 
-my @d = (1,1,1);
-{ 
-  local *STDERR; my $stderr;
-  open STDERR, ">", \$stderr or die;
-  is(_dot(\@a, \@d), 3, "_dot works for \@a > \@b");
+  is(_dot(\@a, \@d), 4, "_dot works for \@a < \@b");
+
+  my $stderr = close_s *STDERR;
   ok($stderr, "but it does complain");
 }
 
+
+my @e = (1,1,1);
+{ 
+  local *STDERR; 
+  open_s(*STDERR);
+
+  is(_dot(\@a, \@e), 3, "_dot works for \@a > \@b");
+
+  my $stderr = close_s *STDERR;
+  ok($stderr, "but it does complain");
 }
+
+

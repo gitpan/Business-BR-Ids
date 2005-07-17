@@ -9,22 +9,22 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our @EXPORT_OK = qw( flatten_ie format_ie parse_ie random_ie );
+our @EXPORT_OK = qw( canon_ie format_ie parse_ie random_ie );
 our @EXPORT = qw( test_ie );
 
-our $VERSION = '0.00_09';
+our $VERSION = '0.00_10';
 
-use Business::BR::Ids::Common qw(_dot _flatten);
+use Business::BR::Ids::Common qw(_dot _canon_i);
 
 ### AC ###
 
 # http://www.sintegra.gov.br/Cad_Estados/cad_AC.html
 
-sub flatten_ie_ac {
-  return _flatten(shift, size => 13);
+sub canon_ie_ac {
+  return _canon_i(shift, size => 13);
 }
 sub test_ie_ac {
-  my $ie = flatten_ie_ac shift;
+  my $ie = canon_ie_ac shift;
   return undef if length $ie != 13;
   return 0 unless $ie =~ /^01/;
   my @ie = split '', $ie;
@@ -37,12 +37,12 @@ sub test_ie_ac {
 
 }
 sub format_ie_ac {
-  my $ie = flatten_ie_ac shift;
+  my $ie = canon_ie_ac shift;
   $ie =~ s|^(..)(...)(...)(...)(..).*|$1.$2.$3/$4-$5|; # 01.004.823/001-12
   return $ie;
 }
 sub _dv_ie_ac {
-	my $base = shift; # expected to be flattened already ?!
+	my $base = shift; # expected to be canon'ed already ?!
 	my $valid = @_ ? shift : 1;
 	my $dev = $valid ? 0 : 2; # deviation (to make IE-PR invalid)
 	my @base = split '', substr($base, 0, 11);
@@ -58,12 +58,81 @@ sub random_ie_ac {
 	return scalar _dv_ie_ac($base, $valid);
 }
 sub parse_ie_ac {
-  my $ie = flatten_ie_ac shift;
+  my $ie = canon_ie_ac shift;
   my ($base, $dv) = $ie =~ /(\d{11})(\d{2})/;
   if (wantarray) {
     return ($base, $dv);
   }
   return { base => $base, dv => $dv };
+}
+
+### AL ###
+
+# http://www.sefaz.al.gov.br/sintegra/cad_AL.asp
+# http://www.sintegra.gov.br/Cad_Estados/cad_AL.html
+
+my %AL_TYPES = (
+  0 => "normal",
+  1 => "normal",
+  3 => "produtor rural",
+  5 => "substituta",
+  6 => "empresa pequeno porte",
+  7 => "micro empresa ambulante",
+  8 => "micro empresa",
+  9 => "especial"
+);
+my @AL_TYPES = keys %AL_TYPES;
+
+sub canon_ie_al {
+  return _canon_i(shift, size => 9);
+}
+sub test_ie_al {
+  my $ie = canon_ie_al shift;
+  return undef if length $ie != 9;
+  return 0 unless $ie =~ /^24/;
+  my @ie = split '', $ie;
+  return 0 unless $AL_TYPES{$ie[2]};
+  my $s1 = _dot([90, 20, 30, 40, 50, 60, 70, 80, -1], \@ie) % 11;
+  #print "ie: $ie, s1: $s1\n";
+  return ($s1==0 || $s1==10 && $ie[8]==0) ? 1 : 0;
+
+}
+sub format_ie_al {
+  my $ie = canon_ie_ac shift;
+  $ie =~ s|^(..)(...)(...)(.).*|$1.$2.$3-$4|; # 24.000.004-8
+  return $ie;
+}
+sub _dv_ie_al {
+	my $base = shift; # expected to be canon'ed already ?!
+	my $valid = @_ ? shift : 1;
+	my $dev = $valid ? 0 : 2; # deviation (to make IE-AL invalid)
+	my @base = split '', $base;
+	my $dv1 = (_dot([90, 20, 30, 40, 50, 60, 70, 80], \@base) + $dev) % 11 % 10;
+	return ($dv1) if wantarray;
+	substr($base, 8, 1) = $dv1;
+	return $base;
+}
+sub random_ie_al {
+	my $valid = @_ ? shift : 1; # valid IE-SP by default
+	my $base = sprintf "24%1s%05s", 
+		               $AL_TYPES[int(rand(@AL_TYPES))], 
+		               int(rand(1E5)); # '24', type and 5 digits
+	return scalar _dv_ie_al($base, $valid);
+}
+sub parse_ie_al {
+  my $ie = canon_ie_al shift;
+  my ($base, $dv) = $ie =~ /(\d{8})(\d{1})/;
+  if (wantarray) {
+    return ($base, $dv);
+  }
+  my $type = substr($ie, 2, 1);
+  return { 
+	  base => $base, 
+	  dv => $dv, 
+	  type => $type,
+	  t_name => $AL_TYPES{$type}
+	  
+  };
 }
 
 
@@ -80,11 +149,11 @@ sub parse_ie_ac {
 #     Exemplo: 123.45678-50
 
 
-sub flatten_ie_pr {
-  return _flatten(shift, size => 10);
+sub canon_ie_pr {
+  return _canon_i(shift, size => 10);
 }
 sub test_ie_pr {
-  my $ie = flatten_ie_pr shift;
+  my $ie = canon_ie_pr shift;
   return undef if length $ie != 10;
   my @ie = split '', $ie;
   my $s1 = _dot([3, 2, 7, 6, 5, 4, 3, 2, 1, 0], \@ie) % 11;
@@ -96,12 +165,12 @@ sub test_ie_pr {
 
 }
 sub format_ie_pr {
-  my $ie = flatten_ie_pr shift;
+  my $ie = canon_ie_pr shift;
   $ie =~ s|^(...)(.....)(..).*|$1.$2-$4|;
   return $ie;
 }
 sub _dv_ie_pr {
-	my $base = shift; # expected to be flattened already ?!
+	my $base = shift; # expected to be canon'ed already ?!
 	my $valid = @_ ? shift : 1;
 	my $dev = $valid ? 0 : 2; # deviation (to make IE-PR invalid)
 	my @base = split '', substr($base, 0, 8);
@@ -117,7 +186,7 @@ sub random_ie_pr {
 	return scalar _dv_ie_pr($base, $valid);
 }
 sub parse_ie_pr {
-  my $ie = flatten_ie_pr shift;
+  my $ie = canon_ie_pr shift;
   my ($base, $dv) = $ie =~ /(\d{8})(\d{2})/;
   if (wantarray) {
     return ($base, $dv);
@@ -127,10 +196,9 @@ sub parse_ie_pr {
 
 ### SP ###
 
-sub flatten_ie_sp {
-  return _flatten(shift, size => 12);
+sub canon_ie_sp {
+  return _canon_i(shift, size => 12);
 }   
-#    META:   _flatten($ie_sp, size => 12 )
 
 #SP - http://www.csharpbr.com.br/arquivos/csharp_mostra_materias.asp?escolha=0021
 #     Exemplo: Inscrição Estadual 110.042.490.114
@@ -139,7 +207,7 @@ sub flatten_ie_sp {
 #     dv[2] = (3 2 10 9 8 7 6 5 4 3 2 1) .* (c[1] ... c[11]) (mod 11)
 
 sub test_ie_sp {
-	my $ie = flatten_ie_sp shift;
+	my $ie = canon_ie_sp shift;
 	return undef if length $ie != 12;
 	my @ie = split '', $ie;
 	my $s1 = _dot([1, 3, 4, 5, 6, 7, 8, 10, -1, 0, 0, 0], \@ie) % 11;
@@ -152,7 +220,7 @@ sub test_ie_sp {
 }
 
 sub format_ie_sp {
-  my $ie = flatten_ie_sp shift;
+  my $ie = canon_ie_sp shift;
   $ie =~ s|^(...)(...)(...)(...).*|$1.$2.$3.$4|;
   return $ie;
 }
@@ -166,7 +234,7 @@ sub format_ie_sp {
 # In list context, it returns the check digits.
 # In scalar context, it returns the complete IE-SP (base and check digits)
 sub _dv_ie_sp {
-	my $base = shift; # expected to be flattened already ?!
+	my $base = shift; # expected to be canon'ed already ?!
 	my $valid = @_ ? shift : 1;
 	my $dev = $valid ? 0 : 2; # deviation (to make IE-SP invalid)
 	my @base = split '', substr($base, 0, 12);
@@ -190,7 +258,7 @@ sub random_ie_sp {
 }
 
 sub parse_ie_sp {
-  my $ie = flatten_ie_sp shift;
+  my $ie = canon_ie_sp shift;
   my ($base, $dv) = $ie =~ /(\d{8})(\d{2})/;
   if (wantarray) {
     return ($base, $dv);
@@ -206,12 +274,18 @@ sub parse_ie_sp {
 my %dispatch_table = (
   # AC
   test_ie_ac => \&test_ie_ac, 
-  flatten_ie_ac => \&flatten_ie_ac, 
+  canon_ie_ac => \&canon_ie_ac, 
   format_ie_ac => \&format_ie_ac,
   random_ie_ac => \&random_ie_ac,
   parse_ie_ac => \&parse_ie_ac,
 
   # AL
+  test_ie_al => \&test_ie_al, 
+  canon_ie_al => \&canon_ie_al, 
+  format_ie_al => \&format_ie_al,
+  random_ie_al => \&random_ie_al,
+  parse_ie_al => \&parse_ie_al,
+
   # AM
   # AP
   # BA
@@ -230,7 +304,7 @@ my %dispatch_table = (
 
   # PR
   test_ie_pr => \&test_ie_pr, 
-  flatten_ie_pr => \&flatten_ie_pr, 
+  canon_ie_pr => \&canon_ie_pr, 
   format_ie_pr => \&format_ie_pr,
   random_ie_pr => \&random_ie_pr,
   parse_ie_pr => \&parse_ie_pr,
@@ -245,7 +319,7 @@ my %dispatch_table = (
 
   # SP
   test_ie_sp => \&test_ie_sp, 
-  flatten_ie_sp => \&flatten_ie_sp, 
+  canon_ie_sp => \&canon_ie_sp, 
   format_ie_sp => \&format_ie_sp,
   random_ie_sp => \&random_ie_sp,
   #parse_ie_sp
@@ -265,9 +339,9 @@ sub test_ie {
 	my $uf = lc shift;
 	return _invoke("test_ie_$uf", @_);
 }
-sub flatten_ie {
+sub canon_ie {
 	my $uf = lc shift;
-	return _invoke("flatten_ie_$uf", @_);
+	return _invoke("canon_ie_$uf", @_);
 }
 sub format_ie {
 	my $uf = lc shift;
@@ -295,7 +369,7 @@ Business::BR::IE - Perl module to test for correct IE numbers
 
 =head1 SYNOPSIS
 
-  use Business::BR::IE qw(test_ie flatten_ie format_ie random_ie); 
+  use Business::BR::IE qw(test_ie canon_ie format_ie random_ie); 
 
   test_ie('sp', '110.042.490.114') # 1
   test_ie('pr', '123.45678-50') # 1
@@ -305,13 +379,13 @@ Business::BR::IE - Perl module to test for correct IE numbers
 =head1 DESCRIPTION
 
 YET TO COME. Handles IE for the states of Acre (AC),
-Sao Paulo (SP) and Paraná (PR) by now.
+Alagoas (AC), Sao Paulo (SP) and Paraná (PR) by now.
 
 =back
 
 =head2 EXPORT
 
-C<test_ie> is exported by default. C<flatten_ie>, C<format_ie>,
+C<test_ie> is exported by default. C<canon_ie>, C<format_ie>,
 C<random_ie> and C<parse_ie> can be exported on demand.
 
 =head1 DETAILS
@@ -351,31 +425,102 @@ it is correct if
 the check equations:
 
   4 a_1 + 3 a_2 + 2 a_3 + 9 a_4  + 8 a_5  + 7 a_6 + 6 a_7 +
-                  5 a_8 + 4 a_9 + 3 a_10 + 2 a_11 +   d_1   = 0 or
-		                                                    = 1 (if d_1 = 0)
+                  5 a_8 + 4 a_9 + 3 a_10 + 2 a_11 +   d_1   = 0 (mod 11) or
+                                                            = 1 (mod 11) (if d_1 = 0)
 
   5 a_1 + 4 a_2 + 3 a_3 + 2 a_4  + 9 a_5  + 8 a_6 + 7 a_7 +
-          6 a_8 + 5 a_9 + 4 a_10 + 3 a_11 + 2 d_1 +   d_2  = 0 or
-		                                                   = 1 (if d_2 = 0)
+          6 a_8 + 5 a_9 + 4 a_10 + 3 a_11 + 2 d_1 +   d_2  = 0 (mod 11) or
+                                                           = 1 (mod 11) (if d_2 = 0)
 
 =back
 
+=head2 AL
+
+The state of Alagoas uses:
+
+=over 4
+
+=item *
+
+9-digits number
+
+=item *
+
+the last one is a check digit
+
+=item *
+
+the usual formatting is like C<'24.000.004-8'>
+
+=item *
+
+if the IE-AL number is decomposed into digits like this
+
+  a_1 a_2 a_3 a_4 a_5 a_6 a_7 a_8 d_1 
+
+it is correct if it always begin with "24" (the code for the 
+state of Alagoas),
+
+  a_1 a_2 = 2 4
+
+if the following digit identifies a valid company type
+
+  0 - "normal"
+  1 - "normal"
+  3 - "produtor rural"
+  5 - "substituta"
+  6 - "empresa pequeno porte"
+  7 - "micro empresa ambulante"
+  8 - "micro empresa"
+  9 - "especial"
+
+and if it satisfies the check equation:
+
+  ( 9 a_1 + 2 a_2 + 3 a_3 + 4 a_4 + 5 a_5
+                    6 a_6 + 7 a_7 + 8 a_8 ) * 10 - d_1 = 0  (mod 11) or
+                                                       = 10 (mod 11) (if d_1 = 0)
+
+=back
 
 =head2 PR
 
 The state of Paraná uses:
 
-  * 10-digits number
-  * the 9th and 10th are check digits
-  * the usual formatting is like C<'123.45678-50'>
+=over 4
+
+=item *
+
+10-digits number
+
+=item *
+
+the 9th and 10th are check digits
+
+=item *
+
+the usual formatting is like C<'123.45678-50'>
+
+=back
 
 =head2 SP
 
 The state of São Paulo uses:
 
-  * 12-digits number
-  * the 9th and 12nd are check digits
-  * the usual formatting is like C<'110.042.490.114'>
+=over 4
+
+=item *
+
+12-digits number
+
+=item *
+
+the 9th and 12nd are check digits
+
+=item *
+
+the usual formatting is like C<'110.042.490.114'>
+
+=back
 
 
 

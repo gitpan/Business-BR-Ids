@@ -1,5 +1,21 @@
 Revision history for Perl extension Business-BR-Ids.
 
+0.00_10 Sun Jul 17 2005
+        - 4 in 27 states (14.8%) supported in Business::BR::IE
+        - "t/001_dot.t" now works for other Perls < 5.008
+        - _dot now deals with untrue's avoiding
+	  to do a computation which would throw
+	  a warning
+        - _flatten in Business::BR::Ids::Common 
+	  renamed to _canon_i
+        - references to 'flatten' renamed to 'canon'
+        - test, flatten, parse, format, random in
+	  Business::BR::Ids renamed to test_id,
+	  flatten_id, parse_id, format_id, random_id:
+	  no more issues with clash with core 'format'
+	  and functions names are better: not so 
+	  general and yet short
+
 0.00_09 Sat Jul 16 2005
         - new test script "t/014_ie_parse.t"
         - parse_ie() in Business::BR:IE

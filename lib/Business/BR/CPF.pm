@@ -13,17 +13,17 @@ our @ISA = qw(Exporter);
 #our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 #our @EXPORT = qw();
 
-our @EXPORT_OK = qw( flatten_cpf format_cpf parse_cpf random_cpf );
+our @EXPORT_OK = qw( canon_cpf format_cpf parse_cpf random_cpf );
 our @EXPORT = qw( test_cpf );
 
-our $VERSION = '0.00_08';
+our $VERSION = '0.00_10';
 
 #use Scalar::Util qw(looks_like_number); 
 
-use Business::BR::Ids::Common qw(_dot _flatten);
+use Business::BR::Ids::Common qw(_dot _canon_i);
 
-sub flatten_cpf {
-  return _flatten(shift, size => 11);
+sub canon_cpf {
+  return _canon_i(shift, size => 11);
 }   
 
 
@@ -32,7 +32,7 @@ sub flatten_cpf {
 # and one that does not satisfy the check equations (0).
 # Correct CPF numbers return 1.
 sub test_cpf {
-  my $cpf = flatten_cpf shift;
+  my $cpf = canon_cpf shift;
   return undef if length $cpf != 11;
   my @cpf = split '', $cpf;
   my $s1 = _dot([10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0], \@cpf) % 11;
@@ -45,13 +45,13 @@ sub test_cpf {
 
 
 sub format_cpf {
-  my $cpf = flatten_cpf shift;
+  my $cpf = canon_cpf shift;
   $cpf =~ s/^(...)(...)(...)(..).*/$1.$2.$3-$4/;
   return $cpf;
 }
 
 sub parse_cpf {
-  my $cpf = flatten_cpf shift;
+  my $cpf = canon_cpf shift;
   my ($base, $dv) = $cpf =~ /(\d{9})(\d{2})/;
   if (wantarray) {
     return ($base, $dv);
@@ -68,7 +68,7 @@ sub parse_cpf {
 # In list context, it returns the check digits.
 # In scalar context, it returns the complete CPF (base and check digits)
 sub _dv_cpf {
-	my $base = shift; # expected to be flattened already ?!
+	my $base = shift; # expected to be canon'ed already ?!
 	my $valid = @_ ? shift : 1;
 	my $dev = $valid ? 0 : 2; # deviation (to make CPF invalid)
 	my @base = split '', substr($base, 0, 9);
@@ -172,12 +172,13 @@ NOTE. Integer numbers like 9999811299 (or 99_998_112_99)
 with fewer than 11 digits will be normalized (eg. to
 "09999811299") before testing.
 
-=item B<flatten_cpf>
+=item B<canon_cpf>
 
-  flatten_cpf(99); # returns '00000000099'
-  flatten_cpf('999.999.999-99'); # returns '99999999999'
+  canon_cpf(99); # returns '00000000099'
+  canon_cpf('999.999.999-99'); # returns '99999999999'
 
-Flattens a candidate for a CPF number. In case,
+Brings a candidate for a CPF number to a canonical form. 
+In case,
 the argument is an integer, it is formatted to at least
 eleven digits. Otherwise, it is stripped of any non-digit
 characters and returned as it is.
@@ -187,7 +188,7 @@ characters and returned as it is.
   format_cpf('00000000000'); # returns '000.000.000-00'
 
 Formats its input into '000.000.000-00' mask.
-First, the argument is flattened and then
+First, the argument is canon'ed and then
 dots and hyphen are added to the first
 11 digits of the result.
 
@@ -197,7 +198,7 @@ dots and hyphen are added to the first
   $hashref = parse_cpf('999.222.111-00'); # { base => '999222111', dv => '00' }
 
 Splits a candidate for CPF number into base and check
-digits (dv - dígitos de verificação). It flattens
+digits (dv - dígitos de verificação). It canon's
 the argument before splitting it into 9- and 2-digits
 parts. In a list context,
 returns a two-element list with the base and the check
@@ -225,7 +226,7 @@ check equations.
 
 =head2 EXPORT
 
-C<test_cpf> is exported by default. C<flatten_cpf>, C<format_cpf>,
+C<test_cpf> is exported by default. C<canon_cpf>, C<format_cpf>,
 C<parse_cpf> and C<random_cpf> can be exported on demand.
 
 

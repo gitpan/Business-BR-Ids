@@ -13,15 +13,15 @@ our @ISA = qw(Exporter);
 #our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 #our @EXPORT = qw();
 
-our @EXPORT_OK = qw( flatten_cnpj format_cnpj parse_cnpj random_cnpj );
+our @EXPORT_OK = qw( canon_cnpj format_cnpj parse_cnpj random_cnpj );
 our @EXPORT = qw( test_cnpj );
 
-our $VERSION = '0.00_08';
+our $VERSION = '0.00_10';
 
-use Business::BR::Ids::Common qw(_dot _flatten);
+use Business::BR::Ids::Common qw(_dot _canon_i);
 
-sub flatten_cnpj {
-  return _flatten(shift, size => 14);
+sub canon_cnpj {
+  return _canon_i(shift, size => 14);
 }   
 
 # there is a subtle difference here between the return for
@@ -29,7 +29,7 @@ sub flatten_cnpj {
 # and one that does not satisfy the check equations (0).
 # Correct CNPJ numbers return 1.
 sub test_cnpj {
-  my $cnpj = flatten_cnpj shift;
+  my $cnpj = canon_cnpj shift;
   return undef if length $cnpj != 14;
   my @cnpj = split '', $cnpj;
   my $s1 = _dot([5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0], \@cnpj) % 11;
@@ -42,13 +42,13 @@ sub test_cnpj {
 
 
 sub format_cnpj {
-  my $cnpj = flatten_cnpj shift;
+  my $cnpj = canon_cnpj shift;
   $cnpj =~ s|^(..)(...)(...)(....)(..).*|$1.$2.$3/$4-$5|;
   return $cnpj;
 }
 
 sub parse_cnpj {
-  my $cnpj = flatten_cnpj shift;
+  my $cnpj = canon_cnpj shift;
   my ($base, $filial, $dv) = $cnpj =~ /(\d{8})(\d{4})(\d{2})/;
   if (wantarray) {
     return ($base, $filial, $dv);
@@ -65,7 +65,7 @@ sub parse_cnpj {
 # In list context, it returns the check digits.
 # In scalar context, it returns the complete CNPJ (base and check digits)
 sub _dv_cnpj {
-	my $base = shift; # expected to be flattened already ?!
+	my $base = shift; # expected to be canon'ed already ?!
 	my $valid = @_ ? shift : 1;
 	my $dev = $valid ? 0 : 2; # deviation (to make CNPJ invalid)
 	my @base = split '', substr($base, 0, 12);
@@ -173,12 +173,12 @@ NOTE. Integer numbers like 3337004000158 (or 3_337_004_0001_58)
 with fewer than 14 digits will be normalized (eg. to
 03_337_004_0001_58) before testing.
 
-=item B<flatten_cnpj>
+=item B<canon_cnpj>
 
-  flatten_cnpj(1); # returns '00000000000001'
-  flatten_cnpj('99.999.222/0001-12'); # returns '99999222000112'
+  canon_cnpj(1); # returns '00000000000001'
+  canon_cnpj('99.999.222/0001-12'); # returns '99999222000112'
 
-Flattens a candidate for a CNPJ number. In case,
+Canon's a candidate for a CNPJ number. In case,
 the argument is an integer, it is formatted to at least
 fourteen digits. Otherwise, it is stripped of any non-digit
 characters and returned as it is.
@@ -188,7 +188,7 @@ characters and returned as it is.
   format_cnpj('00 000 000 0000 00'); # returns '00.000.000/0000-00'
 
 Formats its input into '00.000.000/0000-00' mask.
-First, the argument is flattened and then
+First, the argument is canon'ed and then
 dots, slash and hyphen are added to the first
 14 digits of the result.
 
@@ -198,7 +198,7 @@ dots, slash and hyphen are added to the first
   $hashref = parse_cnpj('11.222.333/4444-00'); # { base => '11222333', filial => '4444' dv => '00' }
 
 Splits a candidate for CNPJ number into base, radical and check
-digits (dv - dígitos de verificação). It flattens
+digits (dv - dígitos de verificação). It canon's
 the argument before splitting it into 8-, 4- and 2-digits
 parts. In a list context,
 returns a three-element list with the base, the radical and the check
@@ -229,7 +229,7 @@ check equations.
 
 =head2 EXPORT
 
-C<test_cnpj> is exported by default. C<flatten_cnpj>, C<format_cnpj>,
+C<test_cnpj> is exported by default. C<canon_cnpj>, C<format_cnpj>,
 C<parse_cnpj> and C<random_cnpj> can be exported on demand.
 
 

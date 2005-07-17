@@ -13,24 +13,29 @@ our @ISA = qw(Exporter);
 #our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 #our @EXPORT = qw();
 
-our @EXPORT_OK = qw( _dot _flatten );
+our @EXPORT_OK = qw( _dot _canon_i );
 
-our $VERSION = '0.00_08';
+our $VERSION = '0.00_10';
 
 sub _dot {
   my $a = shift;
   my $b = shift;
+  warn "arguments a and b should have the same length"
+	unless (@$a==@$b);
   my $s = 0;
   for ( my $i=0; $i<@$a; $i++ ) {
-    $s += $a->[$i]*$b->[$i];
+	my ($x, $y) = ($a->[$i], $b->[$i]);
+	if ($x && $y) {
+	   $s += $x*$y;
+	}
   }
   return $s;
 }
 
 use Scalar::Util qw(looks_like_number); 
 
-# usage: _flatten($piece, size => 12)
-sub _flatten {
+# usage: _canon_i($piece, size => 12)
+sub _canon_i {
   my $piece = shift;
   my %options = @_;
   if (looks_like_number($piece) && int($piece)==$piece) {
@@ -52,10 +57,14 @@ Business::BR::Ids::Common - Common code used in Business-BR-Ids modules
 
 =head1 SYNOPSIS
 
-  use Business::BR::Ids::Common qw(_dot);
+  use Business::BR::Ids::Common qw(_dot _canon_i);
   my @digits = (1, 2, 3, 3);
   my @weights = (2, 3, 2, 2);
   my $dot = _dot(\@weights, \@digits); # computes 2*1+3*2+3*2+2*3
+
+  _canon_i(342222, size => 7); # returns '0342222'
+  _canon_i('12.28.8', size => 5); # returns '12288'
+
 
 
 =head1 DESCRIPTION
@@ -73,7 +82,7 @@ even leave the Business::BR namespace.
 
 =item B<_dot>
 
-  $s = dot(\@a, \@b);
+  $s = _dot(\@a, \@b);
 
 Computes the scalar (or dot) product of two array refs:
 
@@ -81,6 +90,14 @@ Computes the scalar (or dot) product of two array refs:
 
 Note that due to this definition, the second argument 
 should be at least as long as the first argument.
+
+=item B<_canon_i>
+
+  $qs = _canon_i($s, size => 8)
+
+If the argument is a number, formats it to the specified
+size. Then, strips any non-digit character. If the
+argument is a string, it just strips non-digit characters.
 
 =back
 
@@ -90,7 +107,8 @@ None by default.
 
 You can explicitly ask for C<_dot()> which
 is a sub to compute the dot product between two array refs
-(used for computing check digits).
+(used for computing check digits). There is also
+C<_canon_i> to be exported on demand.
 
 
 =head1 SEE ALSO

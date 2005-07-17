@@ -7,10 +7,10 @@ use warnings;
 
 require Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw( flatten parse format random );
-our @EXPORT = qw( test );
+our @EXPORT_OK = qw( canon_id parse_id format_id random_id );
+our @EXPORT = qw( test_id );
 
-our $VERSION = '0.00_09';
+our $VERSION = '0.00_10';
 
 use Carp;
 
@@ -33,24 +33,23 @@ sub _invoke {
 	return &{"${package}::${subroot}${type}"}(@_);
 }
 
-sub test {
+sub test_id {
 	return _invoke(shift, 'test_', @_);
 }
 
-sub flatten {
-	return _invoke(shift, 'flatten_', @_);
+sub canon_id {
+	return _invoke(shift, 'canon_', @_);
 }
 
-# PROBLEM: format is builtin - needs a work around
-#sub format {
-#	return _invoke(shift, 'format_', @_);
-#}
+sub format_id {
+	return _invoke(shift, 'format_', @_);
+}
 
-sub parse {
+sub parse_id {
 	return _invoke(shift, 'parse_', @_);
 }
 
-sub random {
+sub random_id {
 	return _invoke(shift, 'random_', @_);
 }
 
@@ -66,9 +65,9 @@ Business::BR::Ids - Modules for dealing with Brazilian identification codes (CPF
 
   use Business::BR::Ids;
   my $cpf = '390.533.447-05';
-  print "ok as CPF" if test('cpf', $cpf);
+  print "ok as CPF" if test_id('cpf', $cpf);
   my $cnpj = '90.117.749/7654-80';
-  print "ok as CNPJ" if test('cnpj', $cnpj);
+  print "ok as CNPJ" if test_id('cnpj', $cnpj);
 
 =head1 DESCRIPTION
 
@@ -80,25 +79,37 @@ CNPJ and IE numbers without the need for explicitly 'requiring' or
 
 =over 4
 
-=item B<test>
+=item B<test_id>
 
-  test($entity_type, @args); 
-  test('cpf', $cpf); # the same as "require Business::BR::CPF; Business::BR::CPF::test_cpf($cpf)"
+  test_id($entity_type, @args); 
+  test_id('cpf', $cpf); # the same as "require Business::BR::CPF; Business::BR::CPF::test_cpf($cpf)"
 
 Tests for correct inputs of ids which have a corresponding Business::BR module.
 For now, the supported id types are 'cpf', 'cnpj', and 'ie'.
 
+=item B<canon_id>
+
+  canon_id($entity_type, @args)
+
+Transform the input to a canonical form. The canonical
+form is well-defined and as short as possible.
+For instance, C<canon_id('cpf', '29.128.129-11')>
+returns C<'02912812911'> which has exactly 11 digits
+and no extra character.
+
+=back
+
 =head2 EXPORT
 
-C<test> is exported by default. C<flatten>, 
-C<parse> and C<random> are exported on demand.
+C<test_id> is exported by default. C<canon_id>, C<format_id>,
+C<parse_id> and C<random_id> are exported on demand.
 
 =begin comment
 
  =head1 OVERVIEW
 
  test_*
- flatten_*
+ canon_*
  format_*
  parse_*
  random_*
@@ -143,15 +154,15 @@ the specific modules:
 
 =item *
 
-CPF - Business::BR::CPF
+Business::BR::CPF
 
 =item *
 
-CNPJ - Business::BR::CNPJ
+Business::BR::CNPJ
 
 =item *
 
-IE - Business::BR::IE
+Business::BR::IE
 
 =back
 
