@@ -10,7 +10,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( flatten parse format random );
 our @EXPORT = qw( test );
 
-our $VERSION = '0.00_08';
+our $VERSION = '0.00_09';
 
 use Carp;
 
@@ -74,8 +74,8 @@ Business::BR::Ids - Modules for dealing with Brazilian identification codes (CPF
 
 This is a generic module for handling the various supported
 operations on Brazilian identification numbers and codes.
-For example, it is capable to test the correctness of CPF
-and CNPJ numbers without the need for explicitly 'requiring' or
+For example, it is capable to test the correctness of CPF,
+CNPJ and IE numbers without the need for explicitly 'requiring' or
 'using' this modules (doing it automatically on demand).
 
 =over 4
@@ -86,13 +86,12 @@ and CNPJ numbers without the need for explicitly 'requiring' or
   test('cpf', $cpf); # the same as "require Business::BR::CPF; Business::BR::CPF::test_cpf($cpf)"
 
 Tests for correct inputs of ids which have a corresponding Business::BR module.
-For now, the supported id types are 'cpf' and 'cnpj'.
-
-
+For now, the supported id types are 'cpf', 'cnpj', and 'ie'.
 
 =head2 EXPORT
 
-C<test> is exported by default. 
+C<test> is exported by default. C<flatten>, 
+C<parse> and C<random> are exported on demand.
 
 =begin comment
 
@@ -136,6 +135,25 @@ C<test> is exported by default.
 =end comment
 
 =head1 SEE ALSO
+
+Details on handling CPF, CNPJ and IE can be found in
+the specific modules:
+
+=over 4
+
+=item *
+
+CPF - Business::BR::CPF
+
+=item *
+
+CNPJ - Business::BR::CNPJ
+
+=item *
+
+IE - Business::BR::IE
+
+=back
 
 Please reports bugs via CPAN RT, 
 http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-BR-Ids

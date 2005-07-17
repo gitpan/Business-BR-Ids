@@ -5,13 +5,7 @@ use 5;
 use strict;
 use warnings;
 
-#require Exporter;
-#our @ISA = qw(Exporter);
-#our %EXPORT_TAGS = ( 'all' => [ qw() ] );
-#our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-#our @EXPORT = qw();
-
-our $VERSION = '0.00_08';
+our $VERSION = '0.00_09';
 
 1;
 
@@ -51,7 +45,7 @@ for testing the correctness of such concepts.
 
 To be I<correct> does not mean that an identification number or code
 had been I<verified> to stand for some real entry, like an actual 
-Brazilian paytaxer citizen in the case of CPF. This would require
+Brazilian taxpayer citizen in the case of CPF. This would require
 access to government databases which may or may not be available
 in a public basis. And besides, to I<verify> something
 will not be I<easily computed> in general, implying access to

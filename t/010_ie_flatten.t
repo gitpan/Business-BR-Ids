@@ -1,6 +1,8 @@
 
-use Test::More tests => 5;
+use Test::More tests => 6;
 BEGIN { use_ok('Business::BR::IE', 'flatten_ie') };
+
+is(flatten_ie('ac', '00 000 000 000 99'), '0000000000099', 'discards formatting and extras');
 
 is(flatten_ie('sp', 99), '000000000099', 'amenable to ints');
 is(flatten_ie('sp', '999.999.999.999'), '999999999999', 'discards formatting');

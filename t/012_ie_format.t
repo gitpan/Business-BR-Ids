@@ -1,6 +1,8 @@
 
-use Test::More tests => 5;
+use Test::More tests => 6;
 BEGIN { use_ok('Business::BR::IE', 'format_ie') };
+
+is(format_ie('ac', '00 000 000 000 99'), '00.000.000/000-99', 'IE-AC formatting works');
 
 is(format_ie('sp','000000000000'), '000.000.000.000', 'works ok');
 is(format_ie('sp', 6688822200), '006.688.822.200', 'works even for short ints');

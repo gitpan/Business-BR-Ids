@@ -22,4 +22,5 @@ t/010_ie_flatten.t
 t/011_ie_test.t
 t/012_ie_format.t
 t/013_ie_rand.t
+t/014_ie_parse.t
 META.yml                                 Module meta-data (added by MakeMaker)

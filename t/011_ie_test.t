@@ -1,6 +1,11 @@
 
-use Test::More tests => 13;
+use Test::More tests => 16;
 BEGIN { use_ok('Business::BR::IE', 'test_ie') };
+
+ok(test_ie('ac', '01.004.823/001-12'), '"01.004.823/001-12" is a correct IE-AC');
+
+ok(!test_ie('ac', '01.004.823/001-02'), '"01.004.823/001-02" is an incorrect IE-AC');
+ok(!test_ie('ac', '01.004.823/001-13'), '"01.004.823/001-13" is an incorrect IE-AC');
 
 ok(test_ie('pr', '123.45678-50'), '"123.45678-50" is a correct IE-PR');
 

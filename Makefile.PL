@@ -13,5 +13,5 @@ WriteMakefile(
       (#ABSTRACT  => 'Modules for dealing with Brazilian identification codes (CPF, CNPJ, ...)',
 	   ABSTRACT_FROM => 'lib/Business/BR/Ids.pm',
        AUTHOR         => 'A. R. Ferreira <ferreira@cpan.org>') : ()),
-	NO_META => 1,
+	NO_META => 1, # I've seen EU:MM 6.05 complain about this!
 );

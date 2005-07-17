@@ -12,14 +12,60 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( flatten_ie format_ie parse_ie random_ie );
 our @EXPORT = qw( test_ie );
 
-our $VERSION = '0.00_08';
+our $VERSION = '0.00_09';
 
 use Business::BR::Ids::Common qw(_dot _flatten);
 
-#sub test_ie_mg {
-#	my $ie = shift;
-#	return 1;
-#}
+### AC ###
+
+# http://www.sintegra.gov.br/Cad_Estados/cad_AC.html
+
+sub flatten_ie_ac {
+  return _flatten(shift, size => 13);
+}
+sub test_ie_ac {
+  my $ie = flatten_ie_ac shift;
+  return undef if length $ie != 13;
+  return 0 unless $ie =~ /^01/;
+  my @ie = split '', $ie;
+  my $s1 = _dot([4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0], \@ie) % 11;
+  unless ($s1==0 || $s1==1 && $ie[11]==0) {
+    return 0;
+  }
+  my $s2 = _dot([5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2, 1], \@ie) % 11;
+  return ($s2==0 || $s2==1 && $ie[12]==0) ? 1 : 0;
+
+}
+sub format_ie_ac {
+  my $ie = flatten_ie_ac shift;
+  $ie =~ s|^(..)(...)(...)(...)(..).*|$1.$2.$3/$4-$5|; # 01.004.823/001-12
+  return $ie;
+}
+sub _dv_ie_ac {
+	my $base = shift; # expected to be flattened already ?!
+	my $valid = @_ ? shift : 1;
+	my $dev = $valid ? 0 : 2; # deviation (to make IE-PR invalid)
+	my @base = split '', substr($base, 0, 11);
+	my $dv1 = -_dot([4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2], \@base) % 11 % 10;
+	my $dv2 = (-_dot([5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2], [ @base, $dv1 ]) + $dev) % 11 % 10;
+	return ($dv1, $dv2) if wantarray;
+	substr($base, 11, 2) = "$dv1$dv2";
+	return $base;
+}
+sub random_ie_ac {
+	my $valid = @_ ? shift : 1; # valid IE-SP by default
+	my $base = sprintf "01%09s", int(rand(1E9)); # '01' and 9 digits
+	return scalar _dv_ie_ac($base, $valid);
+}
+sub parse_ie_ac {
+  my $ie = flatten_ie_ac shift;
+  my ($base, $dv) = $ie =~ /(\d{11})(\d{2})/;
+  if (wantarray) {
+    return ($base, $dv);
+  }
+  return { base => $base, dv => $dv };
+}
+
 
 ### PR ###
 
@@ -82,12 +128,6 @@ sub parse_ie_pr {
 ### SP ###
 
 sub flatten_ie_sp {
-  #my $ie_sp = shift;
-  #if (looks_like_number($ie_sp) && int($ie_sp)==$ie_sp) {
-  #	  return sprintf('%012s', $ie_sp)
-  #}
-  #$ie_sp =~ s/\D//g;
-  #return $ie_sp;
   return _flatten(shift, size => 12);
 }   
 #    META:   _flatten($ie_sp, size => 12 )
@@ -165,6 +205,12 @@ sub parse_ie_sp {
 
 my %dispatch_table = (
   # AC
+  test_ie_ac => \&test_ie_ac, 
+  flatten_ie_ac => \&flatten_ie_ac, 
+  format_ie_ac => \&format_ie_ac,
+  random_ie_ac => \&random_ie_ac,
+  parse_ie_ac => \&parse_ie_ac,
+
   # AL
   # AM
   # AP
@@ -232,7 +278,10 @@ sub random_ie {
 	return _invoke("random_ie_$uf", @_);
 }
 
-sub parse_ie;
+sub parse_ie {
+	my $uf = lc shift;
+	return _invoke("parse_ie_$uf", @_);
+}
 
 
 
@@ -250,12 +299,13 @@ Business::BR::IE - Perl module to test for correct IE numbers
 
   test_ie('sp', '110.042.490.114') # 1
   test_ie('pr', '123.45678-50') # 1
+  test_ie('ac', '01.004.823/001-12') # 1
 
 
 =head1 DESCRIPTION
 
-YET TO COME. Handles IE for the states of Sao Paulo (SP) 
-and Paraná (PR) by now.
+YET TO COME. Handles IE for the states of Acre (AC),
+Sao Paulo (SP) and Paraná (PR) by now.
 
 =back
 
@@ -268,6 +318,48 @@ C<random_ie> and C<parse_ie> can be exported on demand.
 
 Each state has its own rules for IE numbers. In this section,
 we gloss over each one of these
+
+=head2 AC
+
+The state of Acre uses:
+
+=over 4
+
+=item *
+
+13-digits number
+
+=item *
+
+the last two are check digits
+
+=item *
+
+the usual formatting is like C<'01.004.823/001-12'>
+
+=item *
+
+if the IE-AC number is decomposed into digits like this
+
+  a_1 a_2 a_3 a_4 a_5 a_6 a_7 a_8 a_9 a_10 a_11 d_1 d_2
+
+it is correct if
+
+  a_1 a_2 = 0 1
+
+(that is, it always begin with "01") and if it satisfies
+the check equations:
+
+  4 a_1 + 3 a_2 + 2 a_3 + 9 a_4  + 8 a_5  + 7 a_6 + 6 a_7 +
+                  5 a_8 + 4 a_9 + 3 a_10 + 2 a_11 +   d_1   = 0 or
+		                                                    = 1 (if d_1 = 0)
+
+  5 a_1 + 4 a_2 + 3 a_3 + 2 a_4  + 9 a_5  + 8 a_6 + 7 a_7 +
+          6 a_8 + 5 a_9 + 4 a_10 + 3 a_11 + 2 d_1 +   d_2  = 0 or
+		                                                   = 1 (if d_2 = 0)
+
+=back
+
 
 =head2 PR
 
@@ -289,7 +381,24 @@ The state of São Paulo uses:
 
 =head1 BUGS
 
-dunno
+=over 4
+
+=item *
+
+This documentation is faulty
+
+=item *
+
+If you want handling more than AC, SP and PR, you'll
+have to wait for the next releases
+
+=item *
+
+The handling of IE-SP does not include yet 
+the special rule for testing correctness of
+registrations of rural producers.
+
+=back
 
 =head1 SEE ALSO
 
