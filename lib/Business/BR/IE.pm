@@ -12,7 +12,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( canon_ie format_ie parse_ie random_ie );
 our @EXPORT = qw( test_ie );
 
-our $VERSION = '0.00_11';
+our $VERSION = '0.00_12';
 
 use Business::BR::Ids::Common qw(_dot _canon_i);
 
@@ -239,6 +239,53 @@ sub parse_ie_pr {
   return { base => $base, dv => $dv };
 }
 
+### RR ###
+
+# http://www.sintegra.gov.br/Cad_Estados/cad_RR.html
+
+sub canon_ie_rr {
+  return _canon_i(shift, size => 9);
+}
+sub test_ie_rr {
+  my $ie = canon_ie_rr shift;
+  return undef if length $ie != 9;
+  return 0 unless $ie =~ /^24/;
+  my @ie = split '', $ie;
+  my $s1 = _dot([1, 2, 3, 4, 5, 6, 7, 8, -1], \@ie) % 9;
+  return $s1==0 ? 1 : 0;
+
+}
+sub format_ie_rr {
+  my $ie = canon_ie_rr shift;
+  $ie =~ s|^(..)(...)(...)(.).*|$1.$2.$3-$4|; # 24.006.628-1
+  return $ie;
+}
+sub _dv_ie_rr {
+	my $base = shift; # expected to be canon'ed already ?!
+	my $valid = @_ ? shift : 1;
+	my $dev = $valid ? 0 : 2; # deviation (to make IE-PR invalid)
+	my @base = split '', substr($base, 0, 8);
+	my $dv1 = (_dot([1, 2, 3, 4, 5, 6, 7, 8], \@base)+$dev) % 9;
+	return ($dv1) if wantarray;
+	substr($base, 8, 1) = $dv1;
+	return $base;
+}
+sub random_ie_rr {
+	my $valid = @_ ? shift : 1; # valid IE-SP by default
+	my $base = sprintf "24%06s", int(rand(1E6)); # '24' and 6 digits
+	return scalar _dv_ie_rr($base, $valid);
+}
+sub parse_ie_rr {
+  my $ie = canon_ie_rr shift;
+  my ($base, $dv) = $ie =~ /(\d{8})(\d{1})/;
+  if (wantarray) {
+    return ($base, $dv);
+  }
+  return { base => $base, dv => $dv };
+}
+
+
+
 ### SP ###
 
 sub canon_ie_sp {
@@ -364,6 +411,11 @@ my %dispatch_table = (
   # RN
   # RO
   # RR
+  test_ie_rr => \&test_ie_rr, 
+  canon_ie_rr => \&canon_ie_rr, 
+  format_ie_rr => \&format_ie_rr,
+  random_ie_rr => \&random_ie_rr,
+  parse_ie_rr => \&parse_ie_rr,
   # RS
   # SC
   # SE
@@ -427,11 +479,13 @@ Business::BR::IE - Perl module to test for correct IE numbers
   test_ie('ac', '01.004.823/001-12') # 1
   test_ie('al', '24.000.004-8') # 1
   test_ie('ma', '12.000.038-5') # 1
+  test_ie('rr', '24.006.628-1') # 1
 
 =head1 DESCRIPTION
 
 YET TO COME. Handles IE for the states of Acre (AC),
-Alagoas (AL), Maranhão (MA), Paraná (PR) and Sao Paulo (SP) by now.
+Alagoas (AL), Maranhão (MA), Paraná (PR), Roraima (RR)
+and Sao Paulo (SP) by now.
 
 =head2 EXPORT
 
@@ -587,6 +641,42 @@ the 9th and 10th are check digits
 =item *
 
 the usual formatting is like C<'123.45678-50'>
+
+=back
+
+=head2 RR
+
+The state of Roraima uses:
+
+=over 4
+
+=item *
+
+9-digits number
+
+=item *
+
+the 9th is a check digit
+
+=item *
+
+the usual formatting is like C<'24.006.628-1'>
+
+=item *
+
+if the IE-RR number is decomposed into digits like this
+
+  a_1 a_2 a_3 a_4 a_5 a_6 a_7 a_8 d_1 
+
+it is correct if it always begin with "24" (the code for the 
+state of Roraima),
+
+  a_1 a_2 = 2 4
+
+and if it satisfies the check equation:
+
+  ( 1 a_1 + 2 a_2 + 3 a_3 + 4 a_4 + 5 a_5
+                    6 a_6 + 7 a_7 + 8 a_8 ) - d_1 = 0  (mod 9)
 
 =back
 

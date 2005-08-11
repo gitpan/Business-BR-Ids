@@ -10,7 +10,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( canon_id parse_id format_id random_id );
 our @EXPORT = qw( test_id );
 
-our $VERSION = '0.00_11';
+our $VERSION = '0.00_12';
 
 use Carp;
 

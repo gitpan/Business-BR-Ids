@@ -6,7 +6,7 @@ WriteMakefile(
     NAME              => 'Business-BR-Ids',
     VERSION_FROM      => 'lib/Business/BR/Ids.pm', # finds $VERSION
     PREREQ_PM         => {
-		Scalar::Util => 0, 
+		Scalar::Util => 1.11, 
 		Test::More   => 0, 
 	}, 
     ($] >= 5.005 ?     

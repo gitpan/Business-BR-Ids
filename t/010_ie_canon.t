@@ -1,5 +1,5 @@
 
-use Test::More tests => 8;
+use Test::More tests => 9;
 BEGIN { use_ok('Business::BR::IE', 'canon_ie') };
 
 is(canon_ie('ac', '00 000 000 000 99'), '0000000000099', 'discards formatting and extras');
@@ -7,6 +7,8 @@ is(canon_ie('ac', '00 000 000 000 99'), '0000000000099', 'discards formatting an
 is(canon_ie('al', '00:000:000:9'), '000000009', 'canon for IE-AL ok');
 
 is(canon_ie('ma', '11 222 333 4'), '112223334', 'canon for IE-MA ok');
+
+is(canon_ie('rr', '24006628-1'), '240066281', 'canon for IE-RR ok');
 
 is(canon_ie('sp', 99), '000000000099', 'amenable to ints');
 is(canon_ie('sp', '999.999.999.999'), '999999999999', 'discards formatting');
