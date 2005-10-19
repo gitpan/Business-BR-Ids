@@ -1,5 +1,9 @@
 Revision history for Perl extension Business-BR-Ids.
 
+0.00_13 Wed Oct 19 2005
+        - one more id: the PIS number
+        - new files: "lib/Business/BR/PIS.pm" and two tests "t/*_pis_*.t"
+
 0.00_12 Tue Aug 11 2005
         - added support for IE-RR
         - Scalar::Util 1.11 is needed (this is the

@@ -6,6 +6,7 @@ lib/Business/BR.pm
 lib/Business/BR/CPF.pm
 lib/Business/BR/CNPJ.pm
 lib/Business/BR/IE.pm
+lib/Business/BR/PIS.pm
 lib/Business/BR/Ids.pm
 lib/Business/BR/Ids/Common.pm
 lib/Business/BR/Biz.pm                   DEPRECATED
@@ -23,6 +24,11 @@ t/011_ie_test.t
 t/012_ie_format.t
 t/013_ie_rand.t
 t/014_ie_parse.t
+t/015_pis_test.t
+t/016_pis_rand.t
+#t/017_pis_canon.t
+#t/018_pis_format.t
+#t/019_pis_parse.t
 t/lib/IO/Capture.pm                      Used in t/001_dot.t to capture STDERR
 
 META.yml                                 Module meta-data (added by MakeMaker)

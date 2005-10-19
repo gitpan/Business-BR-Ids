@@ -1,4 +1,4 @@
-Business-BR-Ids version 0.00_12
+Business-BR-Ids version 0.00_13
 ===============================
 
 The intention of this distribution is to provide facilities
@@ -16,6 +16,7 @@ of what they are good for and who emits them.
            emitted by the Brazilian Ministry of Revenue
   * CNPJ - to identify companies as taxpayers in nation-wide context, 
            emitted by the Brazilian Ministry of Revenue
+  * PIS  - 
   * IE-AC
     IE-AL
     IE-MA

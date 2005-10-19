@@ -10,7 +10,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( canon_id parse_id format_id random_id );
 our @EXPORT = qw( test_id );
 
-our $VERSION = '0.00_12';
+our $VERSION = '0.00_13';
 
 use Carp;
 
@@ -19,6 +19,7 @@ my %types = (
   cpf => 'Business::BR::CPF',
   cnpj => 'Business::BR::CNPJ',
   ie => 'Business::BR::IE',
+  pis => 'Business::BR::PIS',
 );
 
 
@@ -85,7 +86,7 @@ CNPJ and IE numbers without the need for explicitly 'requiring' or
   test_id('cpf', $cpf); # the same as "require Business::BR::CPF; Business::BR::CPF::test_cpf($cpf)"
 
 Tests for correct inputs of ids which have a corresponding Business::BR module.
-For now, the supported id types are 'cpf', 'cnpj', and 'ie'.
+For now, the supported id types are 'cpf', 'cnpj', 'ie', and 'pis'.
 
 =item B<canon_id>
 
@@ -147,7 +148,7 @@ C<parse_id> and C<random_id> are exported on demand.
 
 =head1 SEE ALSO
 
-Details on handling CPF, CNPJ and IE can be found in
+Details on handling CPF, CNPJ, IE and PIS can be found in
 the specific modules:
 
 =over 4
@@ -163,6 +164,10 @@ Business::BR::CNPJ
 =item *
 
 Business::BR::IE
+
+=item *
+
+Business::BR::PIS
 
 =back
 
