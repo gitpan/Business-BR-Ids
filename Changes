@@ -1,5 +1,10 @@
 Revision history for Perl extension Business-BR-Ids.
 
+0.00_14 Mon Oct 25 2005
+        - the check equation for IE-AL was wrong: this
+          releases fixes the bug - the problem was
+          test sample too small
+
 0.00_13 Wed Oct 19 2005
         - one more id: the PIS number
         - new files: "lib/Business/BR/PIS.pm" and two tests "t/*_pis_*.t"

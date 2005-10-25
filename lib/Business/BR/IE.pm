@@ -12,7 +12,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( canon_ie format_ie parse_ie random_ie );
 our @EXPORT = qw( test_ie );
 
-our $VERSION = '0.00_12';
+our $VERSION = '0.00_14';
 
 use Business::BR::Ids::Common qw(_dot _canon_i);
 
@@ -92,7 +92,7 @@ sub test_ie_al {
   return 0 unless $ie =~ /^24/;
   my @ie = split '', $ie;
   return 0 unless $AL_TYPES{$ie[2]};
-  my $s1 = _dot([90, 20, 30, 40, 50, 60, 70, 80, -1], \@ie) % 11;
+  my $s1 = _dot([90, 80, 70, 60, 50, 40, 30, 20, -1], \@ie) % 11;
   #print "ie: $ie, s1: $s1\n";
   return ($s1==0 || $s1==10 && $ie[8]==0) ? 1 : 0;
 
@@ -107,13 +107,13 @@ sub _dv_ie_al {
 	my $valid = @_ ? shift : 1;
 	my $dev = $valid ? 0 : 2; # deviation (to make IE-AL invalid)
 	my @base = split '', $base;
-	my $dv1 = (_dot([90, 20, 30, 40, 50, 60, 70, 80], \@base) + $dev) % 11 % 10;
+	my $dv1 = (_dot([90, 80, 70, 60, 50, 40, 30, 20], \@base) + $dev) % 11 % 10;
 	return ($dv1) if wantarray;
 	substr($base, 8, 1) = $dv1;
 	return $base;
 }
 sub random_ie_al {
-	my $valid = @_ ? shift : 1; # valid IE-SP by default
+	my $valid = @_ ? shift : 1; # valid IE-AL by default
 	my $base = sprintf "24%1s%05s", 
 		               $AL_TYPES[int(rand(@AL_TYPES))], 
 		               int(rand(1E5)); # '24', type and 5 digits
