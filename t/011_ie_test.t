@@ -1,5 +1,5 @@
 
-use Test::More tests => 28;
+use Test::More tests => 31;
 BEGIN { use_ok('Business::BR::IE', 'test_ie') };
 
 ok(test_ie('ac', '01.004.823/001-12'), '"01.004.823/001-12" is a correct IE-AC');
@@ -10,6 +10,10 @@ ok(!test_ie('ac', '01.004.823/001-13'), '"01.004.823/001-13" is an incorrect IE-
 ok(test_ie('al', '24.000.004-8'), '"24.000.004-8" is a correct IE-AL');
 
 ok(test_ie('ma', '12.000.038-5'), '"12.000.038-5" is a correct IE-MA');
+
+ok(test_ie('ro', '0000000062521-3'), '"0000000062521-3" is a correct IE-RO');
+ok(test_ie('ro', '42360936787181'), '"42360936787181" is a correct IE-RO');
+ok(!test_ie('ro', '72684661768256'), '"0000000062521-3" is an incorrect IE-RO');
 
 ok(test_ie('rr', '24006628-1'), '"24006628-1" is a correct IE-RR');
 ok(test_ie('rr', '24001755-6'), '"24001755-6" is a correct IE-RR');

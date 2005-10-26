@@ -1,5 +1,5 @@
 
-use Test::More tests => 10;
+use Test::More tests => 11;
 BEGIN { use_ok('Business::BR::IE', 'parse_ie') };
 
 my ($base, $dv);
@@ -16,11 +16,14 @@ is_deeply($info, { base => '01004823001', dv => '12' },
 $info = parse_ie('al', "11.122.333-9");
 is_deeply($info, 
           { base => '11122333', dv => '9', 
-	    type => 1, t_name => 'normal' }, 
+            type => 1, t_name => 'normal' }, 
           'parsing IE-AL works (scalar context)');
 
 $info = parse_ie('ma', "00.111.222-9");
 is_deeply($info, { base => '00111222', dv => '9' }, 'parsing IE-MA works');
+
+$info = parse_ie('ro', "7268466176825-6");
+is_deeply($info, { base => '7268466176825', dv => '6' }, 'parsing IE-RO works');
 
 $info = parse_ie('rr', "24004145-5");
 is_deeply($info, { base => '24004145', dv => '5' }, 'parsing IE-RR works');

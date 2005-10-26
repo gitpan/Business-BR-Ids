@@ -12,7 +12,8 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( canon_ie format_ie parse_ie random_ie );
 our @EXPORT = qw( test_ie );
 
-our $VERSION = '0.00_14';
+our $VERSION = '0.00_15';
+$VERSION = eval $VERSION;
 
 use Business::BR::Ids::Common qw(_dot _canon_i);
 
@@ -211,7 +212,7 @@ sub test_ie_pr {
 }
 sub format_ie_pr {
   my $ie = canon_ie_pr shift;
-  $ie =~ s|^(...)(.....)(..).*|$1.$2-$4|;
+  $ie =~ s|^(...)(.....)(..).*|$1.$2-$3|;
   return $ie;
 }
 sub _dv_ie_pr {
@@ -233,6 +234,49 @@ sub random_ie_pr {
 sub parse_ie_pr {
   my $ie = canon_ie_pr shift;
   my ($base, $dv) = $ie =~ /(\d{8})(\d{2})/;
+  if (wantarray) {
+    return ($base, $dv);
+  }
+  return { base => $base, dv => $dv };
+}
+
+### RO ###
+
+# http://www.sintegra.gov.br/Cad_Estados/cad_RO.html
+
+sub canon_ie_ro {
+  return _canon_i(shift, size => 14);
+}
+sub test_ie_ro {
+  my $ie = canon_ie_ro shift;
+  return undef if length $ie != 14;
+  my @ie = split '', $ie;
+  my $s1 = _dot([6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2, 1], \@ie) % 11;
+  return $s1==0 || $ie[13]==0 && $s1==1;
+}
+sub format_ie_ro {
+  my $ie = canon_ie_ro shift;
+  $ie =~ s|^(.............)(.).*|$1-$2|;
+  return $ie;
+}
+sub _dv_ie_ro {
+	my $base = shift; # expected to be canon'ed already ?!
+	my $valid = @_ ? shift : 1;
+	my $dev = $valid ? 0 : 2; # deviation (to make IE-RO invalid)
+	my @base = split '', substr($base, 0, 13);
+	my $dv = (-_dot([6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2], \@base)+$dev) % 11 % 10;
+	return ($dv) if wantarray;
+	substr($base, 13, 1) = $dv;
+	return $base;
+}
+sub random_ie_ro {
+	my $valid = @_ ? shift : 1; # valid IE-RO by default
+	my $base = sprintf "%013s", int(rand(1E13)); # 13 dígitos   # devia ter maior probabilidade para 000 00000 AAAAA D
+	return scalar _dv_ie_ro($base, $valid);
+}
+sub parse_ie_ro {
+  my $ie = canon_ie_ro shift;
+  my ($base, $dv) = $ie =~ /(\d{13})(\d{1})/;
   if (wantarray) {
     return ($base, $dv);
   }
@@ -410,6 +454,11 @@ my %dispatch_table = (
   # RJ
   # RN
   # RO
+  test_ie_ro => \&test_ie_ro, 
+  canon_ie_ro => \&canon_ie_ro, 
+  format_ie_ro => \&format_ie_ro,
+  random_ie_ro => \&random_ie_ro,
+  parse_ie_ro => \&parse_ie_ro,
   # RR
   test_ie_rr => \&test_ie_rr, 
   canon_ie_rr => \&canon_ie_rr, 
@@ -484,7 +533,7 @@ Business::BR::IE - Perl module to test for correct IE numbers
 =head1 DESCRIPTION
 
 YET TO COME. Handles IE for the states of Acre (AC),
-Alagoas (AL), Maranhão (MA), Paraná (PR), Roraima (RR)
+Alagoas (AL), Maranhão (MA), Paraná (PR), Rondônia (RO), Roraima (RR)
 and Sao Paulo (SP) by now.
 
 =head2 EXPORT
@@ -644,6 +693,39 @@ the usual formatting is like C<'123.45678-50'>
 
 =back
 
+=head2 RO
+
+The state of Rondônia uses:
+
+=over 4
+
+=item *
+
+14-digits number
+
+=item *
+
+the 14th is a check digit
+
+=item *
+
+the usual formatting is like C<'0000000062521-3'>
+
+=item *
+
+if the IE-RO number is decomposed into digits like this
+
+  a_1 a_2 a_3 a_4 a_5 a_6 a_7 a_8 a_9 a_10 a_11 a_12 a_13 d_1 
+
+it is correct if it satisfies the check equation:
+
+  ( 6 a_1 + 5 a_2 + 4 a_3 + 3 a_4 + 2 a_5 +
+    9 a_6 + 8 a_7 + 7 a_8 + 6 a_9 + 5 a_10 +
+    4 a_11 + 3 a_12 + 2 a_13 + d_1            = 0  (mod 11) or
+                                              = 1  (mod 11) if d_1 = 0
+
+=back
+
 =head2 RR
 
 The state of Roraima uses:
@@ -712,7 +794,7 @@ This documentation is faulty
 
 =item *
 
-If you want handling more than AC, AL, MA, PR and SP, you'll
+If you want handling more than AC, AL, MA, PR, RO, RO and SP, you'll
 have to wait for the next releases
 
 =item *
