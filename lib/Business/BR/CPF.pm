@@ -16,14 +16,14 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( canon_cpf format_cpf parse_cpf random_cpf );
 our @EXPORT = qw( test_cpf );
 
-our $VERSION = '0.00_10';
+our $VERSION = '0.00_16';
 
 #use Scalar::Util qw(looks_like_number); 
 
-use Business::BR::Ids::Common qw(_dot _canon_i);
+use Business::BR::Ids::Common qw(_dot _canon_id);
 
 sub canon_cpf {
-  return _canon_i(shift, size => 11);
+  return _canon_id(shift, size => 11);
 }   
 
 
@@ -153,12 +153,12 @@ check equations which validate the last two check digits.
 See L</"THE CHECK EQUATIONS">.
 
 The policy to get rid of '.' and '-' is very liberal. 
-It indeeds discards anything that is not a digit (0, 1, ..., 9).
-That is handy for discarding spaces as well 
+It indeeds discards anything that is not a digit (0, 1, ..., 9)
+or letter. That is handy for discarding spaces as well 
 
   test_cpf(' 263.946.533-30 ') # is ok, returns 1
 
-But extraneous inputs like '#333%444*2a3s2z~00' are
+But extraneous inputs like '#333%444*2.3+2-00' are
 also accepted. If you are worried about this kind of input,
 just check against a regex:
 
@@ -180,8 +180,8 @@ with fewer than 11 digits will be normalized (eg. to
 Brings a candidate for a CPF number to a canonical form. 
 In case,
 the argument is an integer, it is formatted to at least
-eleven digits. Otherwise, it is stripped of any non-digit
-characters and returned as it is.
+eleven digits. Otherwise, it is stripped of any 
+non-alphanumeric characters and returned as it is.
 
 =item B<format_cpf>
 

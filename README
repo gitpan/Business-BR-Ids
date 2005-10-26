@@ -1,4 +1,4 @@
-Business-BR-Ids version 0.00_15
+Business-BR-Ids version 0.00_16
 ===============================
 
 The intention of this distribution is to provide facilities
@@ -16,17 +16,18 @@ of what they are good for and who emits them.
            emitted by the Brazilian Ministry of Revenue
   * CNPJ - to identify companies as taxpayers in nation-wide context, 
            emitted by the Brazilian Ministry of Revenue
-  * PIS  - 
+  * PIS  - to identify citizens as users of the public health services
   * IE-AC
     IE-AL
     IE-MA
     IE-PR
+    IE-RO
     IE-RR
     IE-SP
          - to identify companies as taxpayers in state-wide context,
            emitted by Revenue Secretariats of Brazilian States
-	   (by now supporting only the states of Acre, Alagoas,
-	   Maranhão, Roraima, São Paulo and Paraná)
+           (by now supporting only the states of Acre, Alagoas,
+           Maranhão, Rondônia, Roraima, São Paulo and Paraná)
 
 Some of the next ones to be supported are:
 
@@ -34,8 +35,7 @@ Some of the next ones to be supported are:
            emitted by the Secretariat of Revenue of each state
   * TE   - to identify citizens as allowed voters, emitted by
            Regional Electoral Courts under the control 
-	   of the Superior Electoral Court
-  * PIS  - to identify citizens as users of the public health services
+           of the Superior Electoral Court
 
 INSTALLATION
 
@@ -62,10 +62,11 @@ TO DO
 * introduce the $canon argument to test_*(),
   format_*(), parse_*() methods
 * write tests for module Business::BR::Ids
-* what about Business::BR::PIS and Business::BR::Passport?
+* what about Business::BR::Passport?
 * complete Business::BR::IE
 * enhance Business::BR::Ids docs
 * parse_ie_sp() is missing
+* document Business::BR::PIS
 
 * 0.01 milestone: complete code for IE of each Brazilian state
 

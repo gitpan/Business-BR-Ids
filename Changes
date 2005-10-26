@@ -1,6 +1,11 @@
 Revision history for Perl extension Business-BR-Ids.
 
-0.00_15 Tue Oct 26 2005
+0.00_16 Wed Oct 26 2005
+        - in canon_*(), instead of stripping all non-digits,
+          alphanumeric characters are preserved
+        - canon_ie_*() for each of the 27 states (untested)
+
+0.00_15 Wed Oct 26 2005
         - 7 in 27 states (25.9%) supported in Business::BR::IE
         - added support for IE-RO
 

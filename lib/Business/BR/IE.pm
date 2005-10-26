@@ -12,17 +12,17 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( canon_ie format_ie parse_ie random_ie );
 our @EXPORT = qw( test_ie );
 
-our $VERSION = '0.00_15';
+our $VERSION = '0.00_16';
 $VERSION = eval $VERSION;
 
-use Business::BR::Ids::Common qw(_dot _canon_i);
+use Business::BR::Ids::Common qw(_dot _canon_id);
 
 ### AC ###
 
 # http://www.sintegra.gov.br/Cad_Estados/cad_AC.html
 
 sub canon_ie_ac {
-  return _canon_i(shift, size => 13);
+  return _canon_id(shift, size => 13);
 }
 sub test_ie_ac {
   my $ie = canon_ie_ac shift;
@@ -85,7 +85,7 @@ my %AL_TYPES = (
 my @AL_TYPES = keys %AL_TYPES;
 
 sub canon_ie_al {
-  return _canon_i(shift, size => 9);
+  return _canon_id(shift, size => 9);
 }
 sub test_ie_al {
   my $ie = canon_ie_al shift;
@@ -136,12 +136,54 @@ sub parse_ie_al {
   };
 }
 
+### AP ###
+
+sub canon_ie_ap {
+  return _canon_id(shift, size => 9);
+}
+
+### AM ###
+
+sub canon_ie_am {
+  return _canon_id(shift, size => 9);
+}
+
+### BA ###
+
+sub canon_ie_ba {
+  return _canon_id(shift, size => 8);
+}
+
+### CE ###
+
+sub canon_ie_ce {
+  return _canon_id(shift, size => 9);
+}
+
+### DF ###
+
+sub canon_ie_df {
+  return _canon_id(shift, size => 13);
+}
+
+### ES ###
+
+sub canon_ie_es {
+  return _canon_id(shift, size => 9);
+}
+
+### GO ###
+
+sub canon_ie_go {
+  return _canon_id(shift, size => 9);
+}
+
 ### MA ###
 
 # http://www.sintegra.gov.br/Cad_Estados/cad_MA.html
 
 sub canon_ie_ma {
-  return _canon_i(shift, size => 9);
+  return _canon_id(shift, size => 9);
 }
 sub test_ie_ma {
   my $ie = canon_ie_ma shift;
@@ -181,6 +223,35 @@ sub parse_ie_ma {
   return { base => $base, dv => $dv };
 }
 
+### MT ###
+
+sub canon_ie_mt {
+  return _canon_id(shift, size => 11);
+}
+
+### MS ###
+
+sub canon_ie_ms {
+  return _canon_id(shift, size => 9);
+}
+
+### MG ###
+
+sub canon_ie_mg {
+  return _canon_id(shift, size => 13);
+}
+
+### PA ###
+
+sub canon_ie_pa {
+  return _canon_id(shift, size => 9);
+}
+
+### PB ###
+
+sub canon_ie_pb {
+  return _canon_id(shift, size => 9);
+}
 
 ### PR ###
 
@@ -196,7 +267,7 @@ sub parse_ie_ma {
 
 
 sub canon_ie_pr {
-  return _canon_i(shift, size => 10);
+  return _canon_id(shift, size => 10);
 }
 sub test_ie_pr {
   my $ie = canon_ie_pr shift;
@@ -240,12 +311,42 @@ sub parse_ie_pr {
   return { base => $base, dv => $dv };
 }
 
+### PE ###
+
+sub canon_ie_pe {
+  return _canon_id(shift, size => 14);
+}
+
+### PI ###
+
+sub canon_ie_pi {
+  return _canon_id(shift, size => 9);
+}
+
+### RJ ###
+
+sub canon_ie_rj {
+  return _canon_id(shift, size => 9);
+}
+
+### RN ###
+
+sub canon_ie_rn {
+  return _canon_id(shift, size => 9);
+}
+
+### RS ###
+
+sub canon_ie_rs {
+  return _canon_id(shift, size => 10);
+}
+
 ### RO ###
 
 # http://www.sintegra.gov.br/Cad_Estados/cad_RO.html
 
 sub canon_ie_ro {
-  return _canon_i(shift, size => 14);
+  return _canon_id(shift, size => 14);
 }
 sub test_ie_ro {
   my $ie = canon_ie_ro shift;
@@ -288,7 +389,7 @@ sub parse_ie_ro {
 # http://www.sintegra.gov.br/Cad_Estados/cad_RR.html
 
 sub canon_ie_rr {
-  return _canon_i(shift, size => 9);
+  return _canon_id(shift, size => 9);
 }
 sub test_ie_rr {
   my $ie = canon_ie_rr shift;
@@ -328,12 +429,16 @@ sub parse_ie_rr {
   return { base => $base, dv => $dv };
 }
 
+### SC ###
 
+sub canon_ie_sc {
+  return _canon_id(shift, size => 9);
+}
 
 ### SP ###
 
 sub canon_ie_sp {
-  return _canon_i(shift, size => 12);
+  return _canon_id(shift, size => 12);
 }   
 
 #SP - http://www.csharpbr.com.br/arquivos/csharp_mostra_materias.asp?escolha=0021
@@ -402,6 +507,17 @@ sub parse_ie_sp {
   return { base => $base, dv => $dv };
 }
 
+### SE ###
+
+sub canon_ie_se {
+  return _canon_id(shift, size => 9);
+}
+
+### TO ###
+
+sub canon_ie_to {
+  return _canon_id(shift, size => 11);
+}
 
 # a dispatch table is used here, because we know beforehand 
 # the list of Brazilian states. I am not sure it is
@@ -423,12 +539,26 @@ my %dispatch_table = (
   parse_ie_al => \&parse_ie_al,
 
   # AM
+  canon_ie_am => \&canon_ie_am, 
+
   # AP
+  canon_ie_ap => \&canon_ie_ap, 
+
   # BA
+  canon_ie_ba => \&canon_ie_ba, 
+
   # CE
+  canon_ie_ce => \&canon_ie_ce, 
+
   # DF
+  canon_ie_df => \&canon_ie_df, 
+
   # ES
+  canon_ie_es => \&canon_ie_es, 
+
   # GO
+  canon_ie_go => \&canon_ie_go, 
+
   # MA
   test_ie_ma => \&test_ie_ma, 
   canon_ie_ma => \&canon_ie_ma, 
@@ -436,13 +566,27 @@ my %dispatch_table = (
   random_ie_ma => \&random_ie_ma,
   parse_ie_ma => \&parse_ie_ma,
 
-  #test_ie_mg => \&test_ie_mg,  # MG
+  # MG
+  #test_ie_mg => \&test_ie_mg,  
+  canon_ie_mg => \&canon_ie_mg, 
+
   # MT
+  canon_ie_mt => \&canon_ie_mt, 
+
   # MS
+  canon_ie_ms => \&canon_ie_ms, 
+
   # PE
+  canon_ie_pe => \&canon_ie_pe, 
+
   # PA
+  canon_ie_pa => \&canon_ie_pa, 
+
   # PB 
+  canon_ie_pb => \&canon_ie_pb, 
+
   # PI
+  canon_ie_pi => \&canon_ie_pi, 
 
   # PR
   test_ie_pr => \&test_ie_pr, 
@@ -452,7 +596,11 @@ my %dispatch_table = (
   parse_ie_pr => \&parse_ie_pr,
 
   # RJ
+  canon_ie_rj => \&canon_ie_rj, 
+
   # RN
+  canon_ie_rn => \&canon_ie_rn, 
+
   # RO
   test_ie_ro => \&test_ie_ro, 
   canon_ie_ro => \&canon_ie_ro, 
@@ -466,17 +614,19 @@ my %dispatch_table = (
   random_ie_rr => \&random_ie_rr,
   parse_ie_rr => \&parse_ie_rr,
   # RS
+  canon_ie_rs => \&canon_ie_rs, 
   # SC
+  canon_ie_sc => \&canon_ie_sc, 
   # SE
-
+  canon_ie_se => \&canon_ie_se, 
   # SP
   test_ie_sp => \&test_ie_sp, 
   canon_ie_sp => \&canon_ie_sp, 
   format_ie_sp => \&format_ie_sp,
   random_ie_sp => \&random_ie_sp,
   #parse_ie_sp
-
   # TO
+  canon_ie_to => \&canon_ie_to, 
 
 );
 

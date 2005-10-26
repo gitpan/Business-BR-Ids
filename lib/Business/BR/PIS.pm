@@ -16,12 +16,12 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( canon_pis format_pis parse_pis random_pis );
 our @EXPORT = qw( test_pis );
 
-our $VERSION = '0.00_13';
+our $VERSION = '0.00_16';
 
-use Business::BR::Ids::Common qw(_dot _canon_i);
+use Business::BR::Ids::Common qw(_dot _canon_id);
 
 sub canon_pis {
-  return _canon_i(shift, size => 11);
+  return _canon_id(shift, size => 11);
 }
 
 

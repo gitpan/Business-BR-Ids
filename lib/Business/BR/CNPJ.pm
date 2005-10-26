@@ -16,12 +16,12 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( canon_cnpj format_cnpj parse_cnpj random_cnpj );
 our @EXPORT = qw( test_cnpj );
 
-our $VERSION = '0.00_10';
+our $VERSION = '0.00_16';
 
-use Business::BR::Ids::Common qw(_dot _canon_i);
+use Business::BR::Ids::Common qw(_dot _canon_id);
 
 sub canon_cnpj {
-  return _canon_i(shift, size => 14);
+  return _canon_id(shift, size => 14);
 }   
 
 # there is a subtle difference here between the return for
@@ -154,8 +154,8 @@ check equations which validate the last two check digits.
 See L</"THE CHECK EQUATIONS">.
 
 The policy to get rid of '.', '/' and '-' is very liberal. 
-It indeeds discards anything that is not a digit (0, 1, ..., 9).
-That is handy for discarding spaces as well. 
+It indeeds discards anything that is not a digit (0, 1, ..., 9)
+or letter. That is handy for discarding spaces as well. 
 
   test_cnpj(' 66.818.021/0001-27 ') # is ok, returns 1
 
@@ -180,7 +180,7 @@ with fewer than 14 digits will be normalized (eg. to
 
 Canon's a candidate for a CNPJ number. In case,
 the argument is an integer, it is formatted to at least
-fourteen digits. Otherwise, it is stripped of any non-digit
+fourteen digits. Otherwise, it is stripped of any non-alphanumeric
 characters and returned as it is.
 
 =item B<format_cnpj>

@@ -13,21 +13,22 @@ our @ISA = qw(Exporter);
 #our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 #our @EXPORT = qw();
 
-our @EXPORT_OK = qw( _dot _canon_i );
+our @EXPORT_OK = qw( _dot _canon_i _canon_id );
 
-our $VERSION = '0.00_10';
+our $VERSION = '0.00_16';
+$VERSION = eval $VERSION;
 
 sub _dot {
   my $a = shift;
   my $b = shift;
   warn "arguments a and b should have the same length"
-	unless (@$a==@$b);
+    unless (@$a==@$b);
   my $s = 0;
   for ( my $i=0; $i<@$a; $i++ ) {
-	my ($x, $y) = ($a->[$i], $b->[$i]);
-	if ($x && $y) {
-	   $s += $x*$y;
-	}
+    my ($x, $y) = ($a->[$i], $b->[$i]);
+    if ($x && $y) {
+       $s += $x*$y;
+    }
   }
   return $s;
 }
@@ -39,13 +40,23 @@ sub _canon_i {
   my $piece = shift;
   my %options = @_;
   if (looks_like_number($piece) && int($piece)==$piece) {
-	  return sprintf('%0*s', $options{size}, $piece)
+      return sprintf('%0*s', $options{size}, $piece)
   } else {
-	  $piece =~ s/\D//g;
-	  return $piece;
+      $piece =~ s/\D//g;
+      return $piece;
   }
-}   
+}
 
+sub _canon_id {
+  my $piece = shift;
+  my %options = @_;
+  if (looks_like_number($piece) && int($piece)==$piece) {
+      return sprintf('%0*s', $options{size}, $piece)
+  } else {
+      $piece =~ s/[\W_]//g;
+      return $piece;
+  }
+}
 
 1;
 
@@ -57,7 +68,7 @@ Business::BR::Ids::Common - Common code used in Business-BR-Ids modules
 
 =head1 SYNOPSIS
 
-  use Business::BR::Ids::Common qw(_dot _canon_i);
+  use Business::BR::Ids::Common qw(_dot _canon_i _canon_id);
   my @digits = (1, 2, 3, 3);
   my @weights = (2, 3, 2, 2);
   my $dot = _dot(\@weights, \@digits); # computes 2*1+3*2+3*2+2*3
@@ -65,7 +76,9 @@ Business::BR::Ids::Common - Common code used in Business-BR-Ids modules
   _canon_i(342222, size => 7); # returns '0342222'
   _canon_i('12.28.8', size => 5); # returns '12288'
 
-
+  _canon_i(342222, size => 7); # returns '0342222'
+  _canon_i('12.28.8', size => 5); # returns '12288'
+  _canon_id('A12.3-B', size => 5); # returns 'A123B'
 
 =head1 DESCRIPTION
 
@@ -99,6 +112,15 @@ If the argument is a number, formats it to the specified
 size. Then, strips any non-digit character. If the
 argument is a string, it just strips non-digit characters.
 
+=item B<_canon_id>
+
+  $qs = _canon_id($s, size => 8)
+
+If the argument is a number, formats it to the specified
+size. Then, strips any non-digit character. If the
+argument is a string, it just strips characters
+matching C</[\W_]/>.
+
 =back
 
 =head2 EXPORT
@@ -107,8 +129,8 @@ None by default.
 
 You can explicitly ask for C<_dot()> which
 is a sub to compute the dot product between two array refs
-(used for computing check digits). There is also
-C<_canon_i> to be exported on demand.
+(used for computing check digits). There are also
+C<_canon_i> and C<_canon_id> to be exported on demand.
 
 
 =head1 SEE ALSO

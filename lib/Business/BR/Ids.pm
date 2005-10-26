@@ -10,7 +10,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( canon_id parse_id format_id random_id );
 our @EXPORT = qw( test_id );
 
-our $VERSION = '0.00_15';
+our $VERSION = '0.00_16';
 $VERSION = eval $VERSION;
 
 use Carp;
@@ -31,6 +31,7 @@ sub _invoke {
 	my $package = $types{$type}
 		or croak "unknown '$type'\n";
 	eval "require $package";
+	# FIXME: croak $@ if $@;
 	no strict 'refs';
 	return &{"${package}::${subroot}${type}"}(@_);
 }
