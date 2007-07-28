@@ -11,6 +11,7 @@ lib/Business/BR/Ids.pm
 lib/Business/BR/Ids/Common.pm
 lib/Business/BR/Biz.pm                   DEPRECATED
 t/001_dot.t
+t/051_dot_10.t
 t/002_cpf_test.t
 t/003_cpf_canon.t
 t/004_cpf_format.t

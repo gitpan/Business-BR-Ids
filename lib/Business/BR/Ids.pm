@@ -10,7 +10,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( canon_id parse_id format_id random_id );
 our @EXPORT = qw( test_id );
 
-our $VERSION = '0.00_16';
+our $VERSION = '0.00_18';
 $VERSION = eval $VERSION;
 
 use Carp;
@@ -182,11 +182,10 @@ A. R. Ferreira, E<lt>ferreira@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005 by A. R. Ferreira
+Copyright (C) 2005-2007 by A. R. Ferreira
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.6 or,
-at your option, any later version of Perl 5 you may have available.
+it under the same terms as Perl itself.
 
 
 =cut

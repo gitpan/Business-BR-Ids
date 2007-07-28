@@ -1,12 +1,16 @@
 
-use Test::More tests => 10;
+use Test::More tests => 12;
 BEGIN { use_ok('Business::BR::IE', 'format_ie') };
 
 is(format_ie('ac', '00 000 000 000 99'), '00.000.000/000-99', 'IE-AC formatting works');
 
 is(format_ie('al', '00:000:000:9'), '00.000.000-9', 'formatting IE-AL ok');
 
+is(format_ie('ap', '030123459'), '03.012.345-9', 'formatting IE-AP ok');
+
 is(format_ie('ma', '0 0 1 1 1 2 2 2 3'), '00.111.222-3', 'formatting IE-MA ok');
+
+is( format_ie('mg', '0623079040081'), '062.307.904/0081', 'formatting IE/MG ok' );
 
 is(format_ie('ro', '72684661768256'), '7268466176825-6', 'formatting IE-RO ok');
 

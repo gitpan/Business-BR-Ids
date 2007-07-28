@@ -1,6 +1,6 @@
 
 use constant N => 100;
-use constant N_STATES => 7; # AC, AL, MA, RO, RR, SP and PR by now
+use constant N_STATES => 9; # AC, AL, AP, MA, MG, RO, RR, SP and PR by now
 
 use Test::More tests => 1+2*N*N_STATES;
 BEGIN { use_ok('Business::BR::IE', 'random_ie', 'test_ie') };
@@ -8,18 +8,19 @@ BEGIN { use_ok('Business::BR::IE', 'random_ie', 'test_ie') };
 # the seed is set so that the test is reproducible
 srand(161803398874989);
 
-my @states = qw(AC AL MA PR RO RR SP);
+my @states = qw(AC AL AP MA MG PR RO RR SP);
+#my @states = qw(MG);
 
 for my $s (@states) {
 
-	for ( my $i=0; $i<N; $i++ ) {
-		my $ie = random_ie($s);
-		ok(test_ie($s, $ie), "random IE-$s '$ie' is correct");
-	}
-	for ( my $i=0; $i<N; $i++ ) {
-		my $ie = random_ie($s, 0);
-		ok(!test_ie($s, $ie), "random invalid IE-$s '$ie' is incorrect");
-	}
+  for ( my $i=0; $i<N; $i++ ) {
+    my $ie = random_ie($s);
+    ok(test_ie($s, $ie), "random IE/$s '$ie' is correct");
+  }
+  for ( my $i=0; $i<N; $i++ ) {
+    my $ie = random_ie($s, 0);
+    ok(!test_ie($s, $ie), "random invalid IE/$s '$ie' is incorrect");
+  }
 
 }
 

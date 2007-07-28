@@ -1,5 +1,6 @@
 
-use Test::More tests => 31;
+use Test::More tests => 43;
+#use Test::More no_plan => 1;
 BEGIN { use_ok('Business::BR::IE', 'test_ie') };
 
 ok(test_ie('ac', '01.004.823/001-12'), '"01.004.823/001-12" is a correct IE-AC');
@@ -9,7 +10,30 @@ ok(!test_ie('ac', '01.004.823/001-13'), '"01.004.823/001-13" is an incorrect IE-
 
 ok(test_ie('al', '24.000.004-8'), '"24.000.004-8" is a correct IE-AL');
 
+ok(!test_ie('ap', '00.000.000-0'), '"00.000.000-0" is an incorrect IE-AP'); # does not begin with '03'
+ok(test_ie('ap', '03.012.345-9'), '"03.012.345-9" is a correct IE-AP'); # 1st class, 03.000.001-x up to 03.017.000-x
+
+for (qw(
+ 030210852
+ 030235103
+ 030172588
+ 030010751
+ 030110543
+ 030231159
+ 030221013
+ 030218373
+ 030184403
+)) {
+  ok(test_ie('ap', $_), "\"$_\" is a correct IE-AP");
+}
+
+# 1st class, 03.000.001-x up to 03.017.000-x
+# 2nd class, 03.017.001-x up to 03.019.022-x
+# 3rd class, from 03.019.023-x and on
+
 ok(test_ie('ma', '12.000.038-5'), '"12.000.038-5" is a correct IE-MA');
+
+ok( test_ie('mg', '062.307.904/0081'), q{'062.307.904/0081' is a correct IE/MG} );
 
 ok(test_ie('ro', '0000000062521-3'), '"0000000062521-3" is a correct IE-RO');
 ok(test_ie('ro', '42360936787181'), '"42360936787181" is a correct IE-RO');

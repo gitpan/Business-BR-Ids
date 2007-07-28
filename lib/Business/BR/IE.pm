@@ -12,10 +12,10 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( canon_ie format_ie parse_ie random_ie );
 our @EXPORT = qw( test_ie );
 
-our $VERSION = '0.00_16';
+our $VERSION = '0.00_18'; # ???
 $VERSION = eval $VERSION;
 
-use Business::BR::Ids::Common qw(_dot _canon_id);
+use Business::BR::Ids::Common qw( _dot _dot_10 _canon_id );
 
 ### AC ###
 
@@ -99,7 +99,7 @@ sub test_ie_al {
 
 }
 sub format_ie_al {
-  my $ie = canon_ie_ac shift;
+  my $ie = canon_ie_al shift;
   $ie =~ s|^(..)(...)(...)(.).*|$1.$2.$3-$4|; # 24.000.004-8
   return $ie;
 }
@@ -138,9 +138,71 @@ sub parse_ie_al {
 
 ### AP ###
 
+#***
+
 sub canon_ie_ap {
   return _canon_id(shift, size => 9);
 }
+sub test_ie_ap {
+  my $ie = canon_ie_ap shift;
+  return undef if length $ie != 9;
+  return 0 unless $ie =~ /^03/;
+
+  my $nr_empresa = substr($ie, 2, -1);
+  my ($p, $d) = ($nr_empresa >= 1) && ($nr_empresa <= 17000) ? (5, 0) : # 1st class, 03.000.001-x up to 03.017.000-x
+                ($nr_empresa >= 17001) && ($nr_empresa <= 19022) ? (9, 1) : # 2nd class, 03.017.001-x up to 03.019.022-x
+                (0, 0); # 3rd class, from 03.019.023-x and on
+#  print "(p, d) = ($p, $d)\n";
+
+  my @ie = split '', $ie;
+  my $sum = -($p + _dot([9, 8, 7, 6, 5, 4, 3, 2, 1], \@ie)) % 11; 
+
+#  print "# ie: $ie, sum: $sum\n"; # ***
+  return ($sum==0 || $sum==10 && $ie[8]==0) ? 1 : 0;
+
+} # FIXME: this is not QUITE RIGHT !!!!!!!!!
+sub format_ie_ap {
+  my $ie = canon_ie_ap shift;
+  $ie =~ s|^(..)(...)(...)(.).*|$1.$2.$3-$4|; # 03.012.245-9
+  return $ie;
+}
+sub _dv_ie_ap {
+  my $base = shift; # expected to be canon'ed already ?!
+  my $valid = @_ ? shift : 1;
+  my $dev = $valid ? 0 : 3; # deviation (to make IE-AP invalid)
+  my @base = split '', $base;
+
+  my $nr_empresa = substr($base, 2, -1);
+  my ($p, $d) = ($nr_empresa >= 1) && ($nr_empresa <= 17000) ? (5, 0) : # 1st class, 03.000.001-x up to 03.017.000-x
+                ($nr_empresa >= 17001) && ($nr_empresa <= 19022) ? (9, 1) : # 2nd class, 03.017.001-x up to 03.019.022-x
+                (0, 0); # 3rd class, from 03.019.023-x and on
+
+  my $dv1 = -($p + _dot([9, 8, 7, 6, 5, 4, 3, 2, 0], \@base) + $dev) % 11 % 10;
+  return ($dv1) if wantarray;
+  substr($base, 8, 1) = $dv1;
+  return $base;
+}
+sub random_ie_ap {
+  my $valid = @_ ? shift : 1; # valid IE-AP by default
+  my $base = sprintf "03%06d*", 
+                   int(rand(1E6)); # '03', 6 digits, dv
+  return scalar _dv_ie_ap($base, $valid);
+}
+sub parse_ie_ap {
+  my $ie = canon_ie_ap shift;
+  my ($base, $dv) = $ie =~ /(\d{8})(\d{1})/;
+  if (wantarray) {
+    return ($base, $dv);
+  }
+  return { 
+    base => $base, 
+    dv => $dv, 
+    range => '?'
+  };
+
+}
+
+
 
 ### AM ###
 
@@ -237,9 +299,63 @@ sub canon_ie_ms {
 
 ### MG ###
 
+# http://www.sintegra.gov.br/Cad_Estados/cad_MG.html
+
 sub canon_ie_mg {
-  return _canon_id(shift, size => 13);
+  return _canon_id( shift, size => 13 );
 }
+
+sub test_ie_mg {
+  my $ie = canon_ie_mg( shift );
+  return undef if length $ie != 13;
+  my @ie = split '', $ie;
+
+  my $c1 = - _dot_10( [1, 2, 1,  1, 2, 1, 2, 1, 2, 1, 2, undef, undef], \@ie ) % 10;
+  unless ( $ie[11] eq $c1 ) {
+    return 0;
+  }
+
+  my $s2 = _dot( [ 3, 2, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 ], \@ie ) % 11;
+  return ( $s2==0 || $s2==1 && $ie[12]==0 ) ? 1 : 0;
+}
+
+sub format_ie_mg {
+  my $ie = canon_ie_mg shift;
+  $ie =~ s|^(...)(...)(...)(..)(..).*|$1.$2.$3/$4$5|; # 062.307.904/0081
+  return $ie;
+}
+
+sub parse_ie_mg {
+  my $ie = canon_ie_mg shift;
+  my ($municipio, $inscricao, $ordem, $dv) = $ie =~ /(\d{3})(\d{6})(\d{2})(\d{2})/;
+  if (wantarray) {
+    return ($municipio, $inscricao, $ordem, $dv);
+  }
+  return { 
+    municipio => $municipio, 
+    inscricao => $inscricao, 
+    ordem     => $ordem, 
+    dv        => $dv,
+  };
+}
+
+sub _dv_ie_mg {
+  my $base = shift; # expected to be canon'ed already ?!
+  my $valid = @_ ? shift : 1;
+  my $dev = $valid ? 0 : 2; # deviation (to make IE/MG invalid)
+  my @base = split '', substr($base, 0, 11);
+  my $dv1 = -_dot_10([ 1, 2, 1,  1, 2, 1, 2, 1, 2, 1, 2 ], \@base) % 10;
+  my $dv2 = (-_dot([ 3, 2, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 ], [ @base, $dv1 ]) + $dev) % 11 % 10;
+  return ($dv1, $dv2) if wantarray;
+  substr($base, 11, 2) = "$dv1$dv2";
+  return $base;
+}
+sub random_ie_mg {
+  my $valid = @_ ? shift : 1; # valid IE/MG by default
+  my $base = sprintf "%011s", int(rand(1E11)); # 11 digits
+  return scalar _dv_ie_mg($base, $valid);
+}
+
 
 ### PA ###
 
@@ -542,7 +658,11 @@ my %dispatch_table = (
   canon_ie_am => \&canon_ie_am, 
 
   # AP
+  test_ie_ap => \&test_ie_ap, 
   canon_ie_ap => \&canon_ie_ap, 
+  format_ie_ap => \&format_ie_ap,
+  random_ie_ap => \&random_ie_ap,
+  parse_ie_ap => \&parse_ie_ap,
 
   # BA
   canon_ie_ba => \&canon_ie_ba, 
@@ -567,8 +687,11 @@ my %dispatch_table = (
   parse_ie_ma => \&parse_ie_ma,
 
   # MG
-  #test_ie_mg => \&test_ie_mg,  
+  test_ie_mg => \&test_ie_mg, 
   canon_ie_mg => \&canon_ie_mg, 
+  format_ie_mg => \&format_ie_mg,
+  random_ie_mg => \&random_ie_mg,
+  parse_ie_mg => \&parse_ie_mg,
 
   # MT
   canon_ie_mt => \&canon_ie_mt, 
@@ -678,13 +801,15 @@ Business::BR::IE - Perl module to test for correct IE numbers
   test_ie('ac', '01.004.823/001-12') # 1
   test_ie('al', '24.000.004-8') # 1
   test_ie('ma', '12.000.038-5') # 1
+  test_ie('mg', '062.307.904/0081') #1
   test_ie('rr', '24.006.628-1') # 1
+  test_ie('ap', '03.012.345-9') # 1
 
 =head1 DESCRIPTION
 
 YET TO COME. Handles IE for the states of Acre (AC),
-Alagoas (AL), Maranhão (MA), Paraná (PR), Rondônia (RO), Roraima (RR)
-and Sao Paulo (SP) by now.
+Alagoas (AL), Amapá (AP), Maranhão (MA), Minas Gerais (MG), Paraná (PR), Rondônia (RO), 
+Roraima (RR) and Sao Paulo (SP) by now.
 
 =head2 EXPORT
 
@@ -822,6 +947,33 @@ and if it satisfies the check equation:
 
 =back
 
+=head2 MG
+
+The state of Minas Gerais uses:
+
+=over 4
+
+=item *
+
+13-digits number
+
+=item *
+
+the 11th and 12th are check digits
+
+=item *
+
+the usual formatting is like C<'062.307.904/0081'>
+
+=item *
+
+to determine if IE/MG number is correct, the computation rules in
+
+  http://www.sintegra.gov.br/Cad_Estados/cad_MG.html
+
+must be followed. (Yes, they are boring and hard to describe.)
+
+=back
 
 =head2 PR
 
@@ -944,7 +1096,7 @@ This documentation is faulty
 
 =item *
 
-If you want handling more than AC, AL, MA, PR, RO, RO and SP, you'll
+If you want handling more than AC, AL, MA, MG, PR, RO, RO and SP, you'll
 have to wait for the next releases
 
 =item *
@@ -974,11 +1126,10 @@ A. R. Ferreira, E<lt>ferreira@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005 by A. R. Ferreira
+Copyright (C) 2005-2007 by A. R. Ferreira
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.6 or,
-at your option, any later version of Perl 5 you may have available.
+it under the same terms as Perl itself.
 
 
 =cut

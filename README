@@ -1,4 +1,4 @@
-Business-BR-Ids version 0.00_16
+Business-BR-Ids version 0.00_18
 ===============================
 
 The intention of this distribution is to provide facilities
@@ -17,17 +17,20 @@ of what they are good for and who emits them.
   * CNPJ - to identify companies as taxpayers in nation-wide context, 
            emitted by the Brazilian Ministry of Revenue
   * PIS  - to identify citizens as users of the public health services
-  * IE-AC
-    IE-AL
-    IE-MA
-    IE-PR
-    IE-RO
-    IE-RR
-    IE-SP
+  * IE/AC
+    IE/AL
+    IE/AP
+    IE/MA
+    IE/MG
+    IE/PR
+    IE/RO
+    IE/RR
+    IE/SP
          - to identify companies as taxpayers in state-wide context,
            emitted by Revenue Secretariats of Brazilian States
            (by now supporting only the states of Acre, Alagoas,
-           Maranhão, Rondônia, Roraima, São Paulo and Paraná)
+           Amapá, Maranhão, Minas Gerais, Rondônia, Roraima, São Paulo 
+           and Paraná)
 
 Some of the next ones to be supported are:
 
@@ -72,10 +75,9 @@ TO DO
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2005 by A. R. Ferreira
+Copyright (C) 2005-2007 by A. R. Ferreira
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.6 or,
-at your option, any later version of Perl 5 you may have available.
+it under the same terms as Perl itself.
 
 

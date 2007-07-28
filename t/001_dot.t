@@ -2,7 +2,8 @@
 use lib qw(t/lib);
 use IO::Capture qw(open_s close_s);
 
-use Test::More tests => 7;
+use Test::More tests => 8;
+
 BEGIN { use_ok('Business::BR::Ids::Common', '_dot') };
 
 my @a = (1,1,1,1);
@@ -39,4 +40,9 @@ my @e = (1,1,1);
   ok($stderr, "but it does complain");
 }
 
+{
+  my @a = (1,2,3,3);
+  my @b = (2,5,2,6);
 
+  is( _dot( \@a, \@b ), 36, "the synopsis example works");
+}
