@@ -12,7 +12,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( canon_ie format_ie parse_ie random_ie );
 our @EXPORT = qw( test_ie );
 
-our $VERSION = '0.00_18'; # ???
+our $VERSION = '0.00_19';
 $VERSION = eval $VERSION;
 
 use Business::BR::Ids::Common qw( _dot _dot_10 _canon_id );
@@ -206,8 +206,49 @@ sub parse_ie_ap {
 
 ### AM ###
 
+# http://www.sintegra.gov.br/Cad_Estados/cad_AM.html
+
 sub canon_ie_am {
-  return _canon_id(shift, size => 9);
+  return _canon_id( shift, size => 9 );
+}
+sub test_ie_am {
+  my $ie = canon_ie_am(shift);
+  return undef if length $ie != 9;
+
+  my @ie = split '', $ie;
+  my $s1 = _dot( [ 9, 8, 7, 6, 5, 4, 3, 2, 1 ], \@ie ) % 11;
+  return ( $s1==0 || $s1==1 && $ie[8]==0 ) ? 1 : 0;
+}
+sub format_ie_am {
+  my $ie = canon_ie_am(shift);
+  $ie =~ s|^(..)(...)(...)(.).*|$1.$2.$3-$4|; # 11.111.111-0
+  return $ie;
+}
+sub parse_ie_am {
+  my $ie = canon_ie_am(shift);
+  my ($base, $dv) = $ie =~ /(\d{8})(\d{1})/;
+  if (wantarray) {
+    return ($base, $dv);
+  }
+  return { 
+    base => $base, 
+    dv => $dv, 
+  };
+}
+sub _dv_ie_am {
+  my $base = shift; # expected to be canon'ed already ?!
+  my $valid = @_ ? shift : 1;
+  my $dev = $valid ? 0 : 2; # deviation (to make IE/AM invalid)
+  my @base = split '', substr($base, 0, 8);
+  my $dv1 = (-_dot([9, 8, 7, 6, 5, 4, 3, 2], \@base)+$dev) % 11 % 10;
+  return ($dv1) if wantarray;
+  substr($base, 8, 1) = $dv1;
+  return $base;
+}
+sub random_ie_am {
+  my $valid = @_ ? shift : 1; # valid IE-SP by default
+  my $base = sprintf "%08s", int(rand(1E8)); # 8 digits # XXX IE/AM begins with '04'?
+  return scalar _dv_ie_am($base, $valid);
 }
 
 ### BA ###
@@ -262,19 +303,19 @@ sub format_ie_ma {
   return $ie;
 }
 sub _dv_ie_ma {
-	my $base = shift; # expected to be canon'ed already ?!
-	my $valid = @_ ? shift : 1;
-	my $dev = $valid ? 0 : 2; # deviation (to make IE-MA invalid)
-	my @base = split '', substr($base, 0, 8);
-	my $dv1 = (-_dot([9, 8, 7, 6, 5, 4, 3, 2], \@base)+$dev) % 11 % 10;
-	return ($dv1) if wantarray;
-	substr($base, 8, 1) = $dv1;
-	return $base;
+  my $base = shift; # expected to be canon'ed already ?!
+  my $valid = @_ ? shift : 1;
+  my $dev = $valid ? 0 : 2; # deviation (to make IE-MA invalid)
+  my @base = split '', substr($base, 0, 8);
+  my $dv1 = (-_dot([9, 8, 7, 6, 5, 4, 3, 2], \@base)+$dev) % 11 % 10;
+  return ($dv1) if wantarray;
+  substr($base, 8, 1) = $dv1;
+  return $base;
 }
 sub random_ie_ma {
-	my $valid = @_ ? shift : 1; # valid IE-SP by default
-	my $base = sprintf "12%06s", int(rand(1E6)); # '12' and 6 digits
-	return scalar _dv_ie_ma($base, $valid);
+  my $valid = @_ ? shift : 1; # valid IE-SP by default
+  my $base = sprintf "12%06s", int(rand(1E6)); # '12' and 6 digits
+  return scalar _dv_ie_ma($base, $valid);
 }
 sub parse_ie_ma {
   my $ie = canon_ie_ma shift;
@@ -655,7 +696,11 @@ my %dispatch_table = (
   parse_ie_al => \&parse_ie_al,
 
   # AM
+  test_ie_am => \&test_ie_am, 
   canon_ie_am => \&canon_ie_am, 
+  format_ie_am => \&format_ie_am, 
+  random_ie_am => \&random_ie_am, 
+  parse_ie_am => \&parse_ie_am, 
 
   # AP
   test_ie_ap => \&test_ie_ap, 
@@ -800,6 +845,7 @@ Business::BR::IE - Perl module to test for correct IE numbers
   test_ie('pr', '123.45678-50') # 1
   test_ie('ac', '01.004.823/001-12') # 1
   test_ie('al', '24.000.004-8') # 1
+  test_ie('am', '04.117.161-6') # 1 # ???
   test_ie('ma', '12.000.038-5') # 1
   test_ie('mg', '062.307.904/0081') #1
   test_ie('rr', '24.006.628-1') # 1
@@ -807,9 +853,10 @@ Business::BR::IE - Perl module to test for correct IE numbers
 
 =head1 DESCRIPTION
 
-YET TO COME. Handles IE for the states of Acre (AC),
-Alagoas (AL), Amapá (AP), Maranhão (MA), Minas Gerais (MG), Paraná (PR), Rondônia (RO), 
-Roraima (RR) and Sao Paulo (SP) by now.
+YET TO COME. Handles IE for the states of 
+Acre (AC), Alagoas (AL), Amapá (AP), Amazonas (AM),
+Maranhão (MA), Minas Gerais (MG), Paraná (PR), 
+Rondônia (RO), Roraima (RR) and Sao Paulo (SP) by now.
 
 =head2 EXPORT
 
@@ -907,6 +954,38 @@ and if it satisfies the check equation:
   ( 9 a_1 + 2 a_2 + 3 a_3 + 4 a_4 + 5 a_5
                     6 a_6 + 7 a_7 + 8 a_8 ) * 10 - d_1 = 0  (mod 11) or
                                                        = 10 (mod 11) (if d_1 = 0)
+
+=back
+
+=head2 AM
+
+The state of Amazonas uses:
+
+=over 4
+
+=item *
+
+9-digits number
+
+=item *
+
+the last one is a check digit
+
+=item *
+
+the usual formatting is like C<'11.111.111-0'> ??
+
+=item *
+
+if the IE-AM number is decomposed into digits like this
+
+  a_1 a_2 a_3 a_4 a_5 a_6 a_7 a_8 d_1 
+
+it is correct if it satisfies the check equation:
+
+  9 a_1 + 8 a_2 + 7 a_3 + 6 a_4 + 5 a_5
+                    4 a_6 + 3 a_7 + 2 a_8   + d_1 = 0  (mod 11) or
+                                                  = 1  (mod 11) (if d_1 = 0)
 
 =back
 
@@ -1096,7 +1175,7 @@ This documentation is faulty
 
 =item *
 
-If you want handling more than AC, AL, MA, MG, PR, RO, RO and SP, you'll
+If you want handling more than AC, AL, AM, MA, MG, PR, RO, RO and SP, you'll
 have to wait for the next releases
 
 =item *
@@ -1112,8 +1191,6 @@ the case of unfair digits must be handled satisfactorily
 =back
 
 =head1 SEE ALSO
-
-
 
 Please reports bugs via CPAN RT, 
 http://rt.cpan.org/NoAuth/Bugs.html?Dist=Business-BR-Ids

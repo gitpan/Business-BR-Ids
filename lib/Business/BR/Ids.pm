@@ -10,7 +10,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( canon_id parse_id format_id random_id );
 our @EXPORT = qw( test_id );
 
-our $VERSION = '0.00_18';
+our $VERSION = '0.00_19';
 $VERSION = eval $VERSION;
 
 use Carp;
@@ -26,34 +26,34 @@ my %types = (
 
 # invoke($type, $subroot, @args)
 sub _invoke {
-	my $type = lc shift;
-	my $subroot = shift;
-	my $package = $types{$type}
-		or croak "unknown '$type'\n";
-	eval "require $package";
-	# FIXME: croak $@ if $@;
-	no strict 'refs';
-	return &{"${package}::${subroot}${type}"}(@_);
+  my $type = lc shift;
+  my $subroot = shift;
+  my $package = $types{$type}
+    or croak "unknown '$type'\n";
+  eval "require $package";
+  # FIXME: croak $@ if $@;
+  no strict 'refs';
+  return &{"${package}::${subroot}${type}"}(@_);
 }
 
 sub test_id {
-	return _invoke(shift, 'test_', @_);
+  return _invoke(shift, 'test_', @_);
 }
 
 sub canon_id {
-	return _invoke(shift, 'canon_', @_);
+  return _invoke(shift, 'canon_', @_);
 }
 
 sub format_id {
-	return _invoke(shift, 'format_', @_);
+  return _invoke(shift, 'format_', @_);
 }
 
 sub parse_id {
-	return _invoke(shift, 'parse_', @_);
+  return _invoke(shift, 'parse_', @_);
 }
 
 sub random_id {
-	return _invoke(shift, 'random_', @_);
+  return _invoke(shift, 'random_', @_);
 }
 
 1;

@@ -1,5 +1,5 @@
 
-use Test::More tests => 43;
+use Test::More tests => 44;
 #use Test::More no_plan => 1;
 BEGIN { use_ok('Business::BR::IE', 'test_ie') };
 
@@ -30,6 +30,8 @@ for (qw(
 # 1st class, 03.000.001-x up to 03.017.000-x
 # 2nd class, 03.017.001-x up to 03.019.022-x
 # 3rd class, from 03.019.023-x and on
+
+ok(test_ie('am', '11.111.111-0'), '"11.111.111-0" is a correct IE/AM');
 
 ok(test_ie('ma', '12.000.038-5'), '"12.000.038-5" is a correct IE-MA');
 

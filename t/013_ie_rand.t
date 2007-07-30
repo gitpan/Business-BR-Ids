@@ -1,6 +1,6 @@
 
 use constant N => 100;
-use constant N_STATES => 9; # AC, AL, AP, MA, MG, RO, RR, SP and PR by now
+use constant N_STATES => 10; # AC, AL, AP, AM, MA, MG, RO, RR, SP and PR by now
 
 use Test::More tests => 1+2*N*N_STATES;
 BEGIN { use_ok('Business::BR::IE', 'random_ie', 'test_ie') };
@@ -8,8 +8,8 @@ BEGIN { use_ok('Business::BR::IE', 'random_ie', 'test_ie') };
 # the seed is set so that the test is reproducible
 srand(161803398874989);
 
-my @states = qw(AC AL AP MA MG PR RO RR SP);
-#my @states = qw(MG);
+my @states = qw(AC AL AP AM MA MG PR RO RR SP);
+#my @states = qw(AM);
 
 for my $s (@states) {
 
