@@ -12,7 +12,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( canon_ie format_ie parse_ie random_ie );
 our @EXPORT = qw( test_ie );
 
-our $VERSION = '0.00_19';
+our $VERSION = '0.00_20';
 $VERSION = eval $VERSION;
 
 use Business::BR::Ids::Common qw( _dot _dot_10 _canon_id );
@@ -253,9 +253,83 @@ sub random_ie_am {
 
 ### BA ###
 
+# http://www.sintegra.gov.br/Cad_Estados/cad_BA.html
+
 sub canon_ie_ba {
   return _canon_id(shift, size => 8);
 }
+sub test_ie_ba {
+  my $ie = canon_ie_ba(shift);
+  return undef if length $ie != 8;
+
+  my @ie = split '', $ie;
+  if ( $ie =~ /^[0123458]/ ) { # calculo pelo modulo 10
+
+    my $s2 = _dot( [ 7, 6, 5, 4, 3, 2, undef, 1 ], \@ie ) % 10;
+    unless ( $s2==0 ) {
+      return 0;
+    }
+    my $s1 = _dot( [ 8, 7, 6, 5, 4, 3, 1, 2 ], \@ie ) % 10;
+    return ( $s1==0 ) ? 1 : 0;
+
+  } else { # $ie =~ /^[679]/ # calculo pelo modulo 11
+
+    my $s2 = _dot( [ 7, 6, 5, 4, 3, 2, undef, 1 ], \@ie ) % 11;
+    unless ( $s2==0 || $s2==1 && $ie[7]==0 ) {
+      return 0;
+    }
+    my $s1 = _dot( [ 8, 7, 6, 5, 4, 3, 1, 2 ], \@ie ) % 11;
+    return ( $s1==0 || $s1==1 && $ie[6]==0 ) ? 1 : 0;
+
+  }
+}
+sub format_ie_ba {
+  my $ie = canon_ie_ba(shift);
+  $ie =~ s|^(......)(..).*|$1-$2|; # 123456-63
+  return $ie;
+}
+sub parse_ie_ba {
+  my $ie = canon_ie_ba(shift);
+  my ($base, $dv) = $ie =~ /^(\d{6})(\d{2})/;
+  if (wantarray) {
+    return ($base, $dv);
+  }
+  return { 
+    base => $base, 
+    dv => $dv, 
+  };
+}
+# ???
+sub _dv_ie_ba {
+  my $base = shift; # expected to be canon'ed already ?!
+  my $valid = @_ ? shift : 1;
+  my $dev = $valid ? 0 : 2; # deviation (to make IE/BA invalid)
+  my @base = split '', substr($base, 0, 6);
+
+  if ( $base =~ /^[0123458]/ ) { # calculo pelo modulo 10) 
+
+    my $dv2 = -_dot( [ 7, 6, 5, 4, 3, 2 ], \@base) % 10;
+    my $dv1 = (-_dot( [ 8, 7, 6, 5, 4, 3, 2 ], [ @base, $dv2 ])+$dev) % 10;
+    return ($dv1, $dv2) if wantarray;
+    substr($base, 6, 2) = "$dv1$dv2";
+    return $base;
+
+  } else { # =~ /^[679]/ # calculo pelo modulo 11
+
+    my $dv2 = -_dot( [ 7, 6, 5, 4, 3, 2 ], \@base) % 11 % 10;
+    my $dv1 = (-_dot( [ 8, 7, 6, 5, 4, 3, 2 ], [ @base, $dv2 ])+$dev) % 11 % 10;
+    return ($dv1, $dv2) if wantarray;
+    substr($base, 6, 2) = "$dv1$dv2";
+    return $base;
+
+  }
+}
+sub random_ie_ba {
+  my $valid = @_ ? shift : 1; # valid IE/BA by default
+  my $base = sprintf "%06s", int(rand(1E6)); # 6 digits
+  return scalar _dv_ie_ba($base, $valid);
+}
+
 
 ### CE ###
 
@@ -710,7 +784,11 @@ my %dispatch_table = (
   parse_ie_ap => \&parse_ie_ap,
 
   # BA
+  test_ie_ba => \&test_ie_ba, 
   canon_ie_ba => \&canon_ie_ba, 
+  format_ie_ba => \&format_ie_ba,
+  random_ie_ba => \&random_ie_ba,
+  parse_ie_ba => \&parse_ie_ba,
 
   # CE
   canon_ie_ce => \&canon_ie_ce, 
@@ -845,7 +923,8 @@ Business::BR::IE - Perl module to test for correct IE numbers
   test_ie('pr', '123.45678-50') # 1
   test_ie('ac', '01.004.823/001-12') # 1
   test_ie('al', '24.000.004-8') # 1
-  test_ie('am', '04.117.161-6') # 1 # ???
+  test_ie('am', '04.117.161-6') # 1
+  test_ie('ba', '123456-63') # 1
   test_ie('ma', '12.000.038-5') # 1
   test_ie('mg', '062.307.904/0081') #1
   test_ie('rr', '24.006.628-1') # 1
@@ -855,7 +934,7 @@ Business::BR::IE - Perl module to test for correct IE numbers
 
 YET TO COME. Handles IE for the states of 
 Acre (AC), Alagoas (AL), Amapá (AP), Amazonas (AM),
-Maranhão (MA), Minas Gerais (MG), Paraná (PR), 
+Bahia (BA), Maranhão (MA), Minas Gerais (MG), Paraná (PR), 
 Rondônia (RO), Roraima (RR) and Sao Paulo (SP) by now.
 
 =head2 EXPORT
@@ -973,7 +1052,7 @@ the last one is a check digit
 
 =item *
 
-the usual formatting is like C<'11.111.111-0'> ??
+the usual formatting is like C<'11.111.111-0'>
 
 =item *
 
@@ -986,6 +1065,26 @@ it is correct if it satisfies the check equation:
   9 a_1 + 8 a_2 + 7 a_3 + 6 a_4 + 5 a_5
                     4 a_6 + 3 a_7 + 2 a_8   + d_1 = 0  (mod 11) or
                                                   = 1  (mod 11) (if d_1 = 0)
+
+=back
+
+=head2 BA
+
+The state of Bahia uses:
+
+=over 4
+
+=item *
+
+8-digits number
+
+=item *
+
+the last two are check digits
+
+=item *
+
+the usual formatting is like C<'123456-63'>
 
 =back
 

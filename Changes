@@ -1,5 +1,9 @@
 Revision history for Perl extension Business-BR-Ids.
 
+0.00_20 Tue Aug  7 2007
+        - 11 in 27 states supported in Business::BR::IE
+        - added support for IE/BA
+
 0.00_19 Sat Jul 28 2007
         - 10 in 27 states (37.0%) supported in Business::BR::IE
         - added support for IE-AM
