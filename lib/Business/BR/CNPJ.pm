@@ -16,7 +16,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( canon_cnpj format_cnpj parse_cnpj random_cnpj );
 our @EXPORT = qw( test_cnpj );
 
-our $VERSION = '0.00_16';
+our $VERSION = '0.0022';
 
 use Business::BR::Ids::Common qw(_dot _canon_id);
 

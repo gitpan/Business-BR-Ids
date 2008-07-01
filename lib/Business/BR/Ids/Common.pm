@@ -10,7 +10,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( _dot _dot_10 _canon_i _canon_id );
 
-our $VERSION = '0.00_18';
+our $VERSION = '0.0022';
 $VERSION = eval $VERSION;
 
 sub _dot {

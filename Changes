@@ -1,5 +1,8 @@
 Revision history for Perl extension Business-BR-Ids.
 
+0.0022  Tue Jul  1 2008
+        - promoted to a "stable" release
+
 0.00_21 Mon Sep 17 2007
         - fixed t/002_cpf_test.t and t/015_pis_rand.t
           which did "BEGIN { use_ok }" before setting

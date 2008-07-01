@@ -16,7 +16,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( canon_cpf format_cpf parse_cpf random_cpf );
 our @EXPORT = qw( test_cpf );
 
-our $VERSION = '0.00_16';
+our $VERSION = '0.0022';
 
 #use Scalar::Util qw(looks_like_number); 
 

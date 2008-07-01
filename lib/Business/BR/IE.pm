@@ -12,7 +12,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw( canon_ie format_ie parse_ie random_ie );
 our @EXPORT = qw( test_ie );
 
-our $VERSION = '0.00_20';
+our $VERSION = '0.0022';
 $VERSION = eval $VERSION;
 
 use Business::BR::Ids::Common qw( _dot _dot_10 _canon_id );
